@@ -5,27 +5,29 @@ grapheMPM
 
 Un objet python pour implémenter la méthode des potentiels Métra MPM
 d'ordonnancement.
-La classe `graphMPM` comporte:
+La classe `GrapheMPM` comporte:
 
 * le dictionnaire des `successeurs`
 * celui des `prédecesseurs`,
 * celui des `niveaux` (à créer avec la méthode `setlevel`),
 * la matrice d'adjacence `mat_adj`
-* l'objet `gv` qui est sa traduction GraphViz (à créer et recharger par la méthode `makeGraphviz`)
+* l'objet `gv` qui est sa traduction Graphviz (à créer et recharger par la méthode `makeGraphviz`)
 
 On y a implémenté les méthodes pour les dates au plus tôt, au plus tard.
  
 dépendances:
 ============
 
-modules python: Graphviz, lxml
-logiciel Graphviz
+* modules python: Graphviz, lxml
+* logiciel Graphviz
 
 Illustration de principe:
 =========================
-On créée un objet `GraphMPM` à l'aide d'un dictionnaire des successeurs et un dictionnaire des pondérations.
+On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs et un dictionnaire des pondérations.
 
 ```python
+from grapheMPM import noeud, GrapheMPM
+
 #dico des successeurs
 D = {"déb":"AB", "A": "CD", "B":"D", "C":"E", "D": "E", "E":["fin"], "fin": ""}
 #dico des pondérations
@@ -59,23 +61,16 @@ version de Python >=3.4. En effet, à partir de là, l'installateur pip
 standardise l'installation des modules (et utilise le plus récent format
 d'archive **wheel**)
 
-Il s'agit donc d'installer d'abord les dépendances puis l'archive wheel .whl
+L'installateur pip veillera à installer les dépendances.
 
 Pour windows::
 
 ```
-py -3 -m pip install graphviz lxml \chemin\vers\graphMPM-xxx-py3-none-any.whl
+py -3 -m pip install \chemin\vers\graphMPM-xxx-py3-none-any.whl
 ```
 
 Pour linux::
 
 ```
-sudo pip3 install graphviz lxml /chemin/vers/graphMPM-xxx-py3-none-any.whl
+sudo pip3 install  /chemin/vers/graphMPM-xxx-py3-none-any.whl
 ```
-
-Documentation
-=============
-
-La documentation se trouve dans le dossier *data* du module (à
-chercher dans le dossier de votre python par ex. C:\Python34 ou
-/usr/local/lib/python3.4/dist-packages)

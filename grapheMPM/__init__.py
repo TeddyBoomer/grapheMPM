@@ -47,15 +47,12 @@ class noeud():
         t41.text=self.data["mt"]
         t41.attrib["COLSPAN"]= str(2)
         self.noeud = str(etree.tostring(E),'utf-8')
-        
 
-#A = noeud("test")
-#OUT = etree.tostring(A, pretty_print=True)
-#print(str(OUT, 'utf-8'))
 
-class GraphMPM():
+class GrapheMPM():
     def __init__(self, S, L):
-        """S: dico des successeurs
+        """instanciation d'un graphe MPM
+        S: dico des successeurs
         L: dico des poids des arcs (durées des tâches)
         """
         self.successeurs = S
@@ -79,6 +76,9 @@ class GraphMPM():
         self.predecesseurs = P
 
     def makeGraphviz(self):
+        """générer l'objet graphviz
+        :rtype: None
+        """
         dot = Digraph(comment="graphe MPM",
                       node_attr={"rank":"same", "shape":"plaintext"})
         dot.attr("graph",rankdir="LR")
@@ -96,7 +96,7 @@ class GraphMPM():
     def setlevel(self):
         """calculer les niveaux des sommets
         créer un attribut niveaux de type dict.
-        rtype: None
+        :rtype: None
         """
         A = self.mat_adj.copy()
         L = [(i+1) for i in range(len(A)) if self.col_is_null(A,i)]
@@ -131,7 +131,8 @@ class GraphMPM():
             self.sommets[s].setdata(ed=str(m))
 
     def latestdate(self):
-        """màj des données de ld des nœuds, à faire après earliestdate()"""
+        """màj des données de ld des nœuds, à faire après earliestdate()
+        """
         Ltmp = list(self.niveaux.items())
         L = sorted(Ltmp, key=lambda e:e[1]) # tri sur niveau
         L.reverse() # en ordre décroissant
@@ -151,15 +152,3 @@ class GraphMPM():
             mt = int(self.sommets[s].data["ld"])-int(self.sommets[s].data["ed"])
             self.sommets[s].setdata(mt=str(mt), ml=str(ml))
 
-# dot = Digraph(comment="ordonnancement_cours", node_attr={"rank":"same", "shape":"plaintext"})
-# dot.attr("graph",rankdir="LR")
-# for k in D.keys():
-#     N = noeud(k)
-#     O = str(etree.tostring(N.noeud),'utf-8') #,pretty_print=True
-#     dot.node(str(k), "<{}>".format(O))
-# 
-# for k in D.keys():
-#     for i in list(D[k]):
-#         dot.edge(k, i, label=str(L[k]), tailport="from", headport="to")
-# #dot.engine='circo' # in dot, neato, circo
-# dot.render('cours_ordo1.png', view=True)
