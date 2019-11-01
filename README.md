@@ -32,7 +32,7 @@ from grapheMPM import noeud, GrapheMPM
 D = {"déb":"AB", "A": "CD", "B":"D", "C":"E", "D": "E", "E":["fin"], "fin": ""}
 #dico des pondérations
 L = {"A":2, "B":4, "C":4, "D":5, "E":6, "déb":0, "fin":0}
-G = GraphMPM(D,L)
+G = GrapheMPM(D,L)
 G.setlevel()                                                            
 G.earliestdate()
 G.makeGraphviz()
@@ -66,11 +66,11 @@ L'installateur pip veillera à installer les dépendances.
 Pour windows::
 
 ```
-py -3 -m pip install \chemin\vers\graphMPM-xxx-py3-none-any.whl
+py -3 -m pip install \chemin\vers\grapheMPM-xxx-py3-none-any.whl
 ```
 
 Pour linux::
 
 ```
-sudo pip3 install  /chemin/vers/graphMPM-xxx-py3-none-any.whl
+sudo pip3 install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
