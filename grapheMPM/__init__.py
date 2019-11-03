@@ -80,11 +80,18 @@ class GrapheMPM():
         :rtype: None
         """
         dot = Digraph(comment="graphe MPM",
-                      node_attr={"rank":"same", "shape":"plaintext"})
+                      node_attr={"shape":"plaintext"})
         dot.attr("graph",rankdir="LR")
         dot.format ="png"
-        for k,n in self.sommets.items(): # key, noeud
-            dot.node(str(k), "<{}>".format(n.noeud))
+        # création des sous-graphes par niveau
+        NIVtmp = list(set(self.niveaux.values()))
+        NIV = sorted(NIVtmp)
+        for N in NIV:
+            with dot.subgraph(name="cluster_{}".format(N), node_attr={'rank': 'same'}) as c:
+                c.attr(style="invis") # désactivation du cadre de cluster
+                for k,n in self.sommets.items(): # key, noeud
+                    if self.niveaux[k] == N:
+                        c.node(str(k), "<{}>".format(n.noeud))
             # la str html doit être encadrée de <>
 
         for k,L in self.successeurs.items():

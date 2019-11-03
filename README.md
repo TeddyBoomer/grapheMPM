@@ -10,7 +10,8 @@ La classe `GrapheMPM` comporte:
 * le dictionnaire des `successeurs`
 * celui des `prédecesseurs`,
 * celui des `niveaux` (à créer avec la méthode `setlevel`),
-* la matrice d'adjacence `mat_adj`
+* la matrice d'adjacence `mat_adj`,
+* le dictionnaire des `sommets` pour lier leur nom à leur emplacement dans la matrice d'adjacence,
 * l'objet `gv` qui est sa traduction Graphviz (à créer et recharger par la méthode `makeGraphviz`)
 
 On y a implémenté les méthodes pour les dates au plus tôt, au plus tard.
@@ -18,7 +19,7 @@ On y a implémenté les méthodes pour les dates au plus tôt, au plus tard.
 dépendances:
 ============
 
-* modules python: Graphviz, lxml
+* modules python: Graphviz, lxml, numpy
 * logiciel Graphviz
 
 Illustration de principe:
