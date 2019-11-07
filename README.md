@@ -1,6 +1,7 @@
 grapheMPM
 =========
 :page Github: https://github.com/TeddyBoomer/grapheMPM
+
 :Téléchargement: https://github.com/TeddyBoomer/grapheMPM/releases
 
 Un objet python pour implémenter la méthode des potentiels Métra MPM
@@ -29,24 +30,32 @@ On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs et u
 ```python
 from grapheMPM import noeud, GrapheMPM
 
-#dico des successeurs
-D = {"déb":"AB", "A": "CD", "B":"D", "C":"E", "D": "E", "E":["fin"], "fin": ""}
+#dico des prédecesseurs
+p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
+"F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
 #dico des pondérations
-L = {"A":2, "B":4, "C":4, "D":5, "E":6, "déb":0, "fin":0}
-G = GrapheMPM(D,L)
-G.setlevel()                                                            
+w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
+"F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
+G = GrapheMPM(pred=p, pond=w)
+G.setlevel()
 G.earliestdate()
 G.makeGraphviz()
-G.gv.render("ex1-ed")
+G.gv.render("ex-ed")
 ```
-<img src="ex1-ed.png" width="500">
+<img src="ex-ed.png" width="500">
 
 ```python
 G.latestdate()
 G.makeGraphviz()
 G.gv.render("ex1-full")
 ```
-<img src="ex1-full.png" width="500">
+<img src="ex-full.png" width="500">
+
+**attention**: depuis la version v0.3, on initialise l'objet avec des éléments
+nommés:
+
+* au choix `pred` ou `succ` dictionnaire des prédécesseurs (resp. des successeurs)
+* `pond` dictionnaire des pondérations.
 
 La méthode `setlevel` applique l'algorithme de recherche des niveaux à partir
 de l'observation des colonnes nulles de la matrice d'adjacence `mat_adj`.

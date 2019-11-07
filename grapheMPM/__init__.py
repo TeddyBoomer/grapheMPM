@@ -50,30 +50,77 @@ class noeud():
 
 
 class GrapheMPM():
-    def __init__(self, S, L):
+    """Classe de génération d'un graphe d'ordonnancement par les potentiels
+    Métra.
+
+    Initialisation possible via (successeurs ou prédécesseur ) et pondérations.
+
+    Exemple::
+
+    >>>p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
+       "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
+    >>>w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
+       "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
+    >>>G = GrapheMPM(pred=p, pond=w)
+    >>>G.setlevel()
+    >>>G.earliestdate()
+    >>>G.makeGraphviz()
+    >>>G.gv.render("ex-ed")
+    >>>G.latestdate()
+    >>>G.makeGraphviz()
+    >>>G.gv.render("ex-full")
+    """
+    
+    def __init__(self, succ=None, pred=None, pond=None):
         """instanciation d'un graphe MPM
-        S: dico des successeurs
-        L: dico des poids des arcs (durées des tâches)
+        2 possibilités d'initialisation avec l'un des dictionnaires
+        succ: dico des successeurs
+        pred: dico des prédecesseurs
+
+        pond: dico des poids des arcs (durées des tâches)
         """
-        self.successeurs = S
-        # sommets: set(S.keys())
-        self.ponderation = L
-        self.sommets = {}
-        for k in S.keys():
-            self.sommets[k] = noeud(k)
-        s = list(S.keys()) # list des sommets
-        ssort = sorted(s)
-        N = len(ssort)
-        d = dict(zip(range(1,N+1),ssort))
-        self.num_sommets = d
-        self.mat_adj = matrix([[ (1 if (d[j] in S[d[i]]) else 0)
-                                 for j in range(1,N+1)] for i in range(1,N+1)])
-        # dico des prédecesseurs
-        P = {}
-        for i in range(1,N+1):
-            pi = [d[j+1] for j in range(N) if self.mat_adj[j,i-1] != 0]
-            P[d[i]] = pi
-        self.predecesseurs = P
+        if succ:
+            self.successeurs = succ
+            # sommets: set(succ.keys())
+            self.ponderation = pond
+            self.sommets = {}
+            for k in succ.keys():
+                self.sommets[k] = noeud(k)
+            s = list(succ.keys()) # list des sommets
+            ssort = sorted(s)
+            N = len(ssort)
+            d = dict(zip(range(1,N+1),ssort))
+            self.num_sommets = d
+            self.mat_adj = matrix([[ (1 if (d[j] in succ[d[i]]) else 0)
+                                     for j in range(1,N+1)]
+                                   for i in range(1,N+1)])
+            # dico des prédecesseurs
+            P = {}
+            for i in range(1,N+1):
+                pi = [d[j+1] for j in range(N) if self.mat_adj[j,i-1] != 0]
+                P[d[i]] = pi
+            self.predecesseurs = P
+        elif pred:
+            self.predecesseurs = pred
+            # sommets: set(succ.keys())
+            self.ponderation = pond
+            self.sommets = {}
+            for k in pred.keys():
+                self.sommets[k] = noeud(k)
+            s = list(pred.keys()) # list des sommets
+            ssort = sorted(s)
+            N = len(ssort)
+            d = dict(zip(range(1,N+1),ssort))
+            self.num_sommets = d
+            self.mat_adj = matrix([[ (1 if (d[i] in pred[d[j]]) else 0)
+                                     for j in range(1,N+1)]
+                                   for i in range(1,N+1)])
+            # dico des successeurs
+            S = {}
+            for i in range(1,N+1):
+                pi = [d[j+1] for j in range(N) if self.mat_adj[i-1,j] != 0]
+                S[d[i]] = pi
+            self.successeurs = S
 
     def makeGraphviz(self):
         """générer l'objet graphviz
