@@ -58,7 +58,7 @@ class GrapheMPM():
     Exemple::
 
     >>>p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
-       "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
+       "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "fin": "J"}
     >>>w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
        "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
     >>>G = GrapheMPM(pred=p, pond=w)
@@ -134,7 +134,8 @@ class GrapheMPM():
         NIVtmp = list(set(self.niveaux.values()))
         NIV = sorted(NIVtmp)
         for N in NIV:
-            with dot.subgraph(name="cluster_{}".format(N), node_attr={'rank': 'same'}) as c:
+            with dot.subgraph(name="cluster_{}".format(N),
+                              node_attr={'rank': 'same'}) as c:
                 c.attr(style="invis") # désactivation du cadre de cluster
                 for k,n in self.sommets.items(): # key, noeud
                     if self.niveaux[k] == N:
@@ -201,7 +202,7 @@ class GrapheMPM():
             tmp =[int(self.sommets[e].data["ed"])-self.ponderation[s]\
                   -int(self.sommets[s].data["ed"])
                       for e in self.successeurs[s]]
-            ml = (min(tmp) if len(tmp)>0 else self.sommets[s].data["ed"])
+            ml = (min(tmp) if len(tmp)>0 else 0) #self.sommets[s].data["ed"]
             #marge totale
             mt = int(self.sommets[s].data["ld"])-int(self.sommets[s].data["ed"])
             self.sommets[s].setdata(mt=str(mt), ml=str(ml))

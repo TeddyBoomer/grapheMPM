@@ -9,7 +9,7 @@ d'ordonnancement.
 La classe `GrapheMPM` comporte:
 
 * le dictionnaire des `successeurs`
-* celui des `prédecesseurs`,
+* celui des `predecesseurs`,
 * celui des `niveaux` (à créer avec la méthode `setlevel`),
 * la matrice d'adjacence `mat_adj`,
 * le dictionnaire des `sommets` pour lier leur nom à leur emplacement dans la matrice d'adjacence,
@@ -25,14 +25,14 @@ dépendances:
 
 Illustration de principe:
 =========================
-On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs et un dictionnaire des pondérations.
+On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs ou des prédecesseurs et un dictionnaire des pondérations.
 
 ```python
-from grapheMPM import noeud, GrapheMPM
+from grapheMPM import GrapheMPM
 
 #dico des prédecesseurs
 p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
-"F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
+"F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "fin": "J"}
 #dico des pondérations
 w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
 "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
