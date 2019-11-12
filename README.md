@@ -1,8 +1,9 @@
 grapheMPM
 =========
-:page Github: https://github.com/TeddyBoomer/grapheMPM
 
-:Téléchargement: https://github.com/TeddyBoomer/grapheMPM/releases
+* [page Github](https://github.com/TeddyBoomer/grapheMPM)
+
+* [Téléchargement](https://github.com/TeddyBoomer/grapheMPM/releases)
 
 Un objet python pour implémenter la méthode des potentiels Métra MPM
 d'ordonnancement.
@@ -25,15 +26,16 @@ dépendances:
 
 Illustration de principe:
 =========================
+
 On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs ou des prédecesseurs et un dictionnaire des pondérations.
 
 ```python
 from grapheMPM import GrapheMPM
 
-#dico des prédecesseurs
+# dico des prédecesseurs
 p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
 "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "fin": "J"}
-#dico des pondérations
+# dico des pondérations
 w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
 "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
 G = GrapheMPM(pred=p, pond=w)
@@ -51,7 +53,7 @@ G.gv.render("ex1-full")
 ```
 <img src="ex-full.png" width="500">
 
-**attention**: depuis la version v0.3, on initialise l'objet avec des éléments
+**Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
 nommés:
 
 * au choix `pred` ou `succ` dictionnaire des prédécesseurs (resp. des successeurs)
