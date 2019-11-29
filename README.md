@@ -53,6 +53,14 @@ G.gv.render("ex1-full")
 ```
 <img src="ex-full.png" width="500">
 
+**Nouveau (version >=0.3.3)**: un nouveau paramètre `presentation` (à 1 par défaut) permet de régler la répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe complet avec `presentation=2`:
+
+```python
+G = GrapheMPM(pred=p, pond=w, presentation=2)
+# […]
+```
+<img src="ex-full-2.png" width="500">
+
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
 nommés:
 

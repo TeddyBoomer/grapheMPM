@@ -3,18 +3,23 @@ from graphviz import Digraph
 from lxml import etree
 
 class noeud():
-    def __init__(self,titre,**kwargs):
+    def __init__(self,titre,presentation=1,**kwargs):
         """initialisation d'un nœud dans un graphe MPM (potentiels Metra)
         les kwargs contiennent:
         ed: earliest date, la date au plus tôt
         ld: latest date, la date au plus tard
         ml: marge libre
         mt: marge totale
+
+        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml -mt côte
+             à côte
+        :type presentation: int
         """
         self.data = {"ed": "    ", "ld": "    ",
                      "ml": "    ", "mt": "    "}
         self.data.update(kwargs)
         self.titre = titre
+        self.presentation = presentation
         self.setdata(**kwargs)
 
     def setdata(self,**kwargs):
@@ -38,14 +43,21 @@ class noeud():
         t22 = etree.SubElement(T2, "TD")
         t22.text=self.data["ld"]
         t22.attrib["PORT"]="from"
-        T3 = etree.SubElement(E,"TR")
-        t31 = etree.SubElement(T3, "TD")
-        t31.text=self.data["ml"]
-        t31.attrib["COLSPAN"]= str(2)
-        T4 = etree.SubElement(E,"TR")
-        t41 = etree.SubElement(T4, "TD")
-        t41.text=self.data["mt"]
-        t41.attrib["COLSPAN"]= str(2)
+        if self.presentation==1:
+            T3 = etree.SubElement(E,"TR")
+            t31 = etree.SubElement(T3, "TD")
+            t31.text=self.data["ml"]
+            t31.attrib["COLSPAN"]= str(2)
+            T4 = etree.SubElement(E,"TR")
+            t41 = etree.SubElement(T4, "TD")
+            t41.text=self.data["mt"]
+            t41.attrib["COLSPAN"]= str(2)
+        elif self.presentation==2:
+            T3 = etree.SubElement(E,"TR")
+            t31 = etree.SubElement(T3, "TD")
+            t31.text=self.data["ml"]
+            t32 = etree.SubElement(T3, "TD")
+            t32.text=self.data["mt"]
         self.noeud = str(etree.tostring(E),'utf-8')
 
 
@@ -71,13 +83,16 @@ class GrapheMPM():
     >>>G.gv.render("ex-full")
     """
     
-    def __init__(self, succ=None, pred=None, pond=None):
+    def __init__(self, succ=None, pred=None, pond=None, presentation=1):
         """instanciation d'un graphe MPM
         2 possibilités d'initialisation avec l'un des dictionnaires
         succ: dico des successeurs
         pred: dico des prédecesseurs
 
         pond: dico des poids des arcs (durées des tâches)
+        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml -mt côte
+             à côte
+        :type presentation: int
         """
         if succ:
             self.successeurs = succ
@@ -85,7 +100,7 @@ class GrapheMPM():
             self.ponderation = pond
             self.sommets = {}
             for k in succ.keys():
-                self.sommets[k] = noeud(k)
+                self.sommets[k] = noeud(k,presentation=presentation)
             s = list(succ.keys()) # list des sommets
             ssort = sorted(s)
             N = len(ssort)
@@ -106,7 +121,7 @@ class GrapheMPM():
             self.ponderation = pond
             self.sommets = {}
             for k in pred.keys():
-                self.sommets[k] = noeud(k)
+                self.sommets[k] = noeud(k,presentation=presentation)
             s = list(pred.keys()) # list des sommets
             ssort = sorted(s)
             N = len(ssort)
