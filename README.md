@@ -27,6 +27,8 @@ dépendances:
 Illustration de principe:
 =========================
 
+**Nouveau (v>=0.4)**: Les poids peuvent être des décimaux.
+
 On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs ou des prédecesseurs et un dictionnaire des pondérations.
 
 ```python
@@ -36,7 +38,7 @@ from grapheMPM import GrapheMPM
 p = {"déb":"", "A":['déb'], "B":['déb'], "C": "A", "D": "AB", "E":"B",
 "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "fin": "J"}
 # dico des pondérations
-w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
+w = {"déb": 0, "fin": 0,"A": 7, "B": 3, "C": 4.1, "D": 2.3, "E": 8,
 "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
 G = GrapheMPM(pred=p, pond=w)
 G.setlevel()
@@ -49,7 +51,7 @@ G.gv.render("ex-ed")
 ```python
 G.latestdate()
 G.makeGraphviz()
-G.gv.render("ex1-full")
+G.gv.render("ex-full")
 ```
 <img src="ex-full.png" width="500">
 
@@ -83,13 +85,13 @@ d'archive **wheel**)
 
 L'installateur pip veillera à installer les dépendances.
 
-Pour windows::
+Pour windows:
 
 ```
 py -3 -m pip install \chemin\vers\grapheMPM-xxx-py3-none-any.whl
 ```
 
-Pour linux::
+Pour linux:
 
 ```
 sudo pip3 install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
