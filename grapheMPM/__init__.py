@@ -1,4 +1,4 @@
-from numpy import matrix, prod
+from numpy import matrix, prod, float_, round, floor
 from graphviz import Digraph
 from lxml import etree
 
@@ -11,7 +11,7 @@ class noeud():
         ml: marge libre
         mt: marge totale
 
-        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml -mt côte
+        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml-mt côte
              à côte
         :type presentation: int
         """
@@ -24,6 +24,7 @@ class noeud():
 
     def setdata(self,**kwargs):
         """mettre à jour les données du noeud
+        les paramètres doivent être de type str
         """
         self.data.update(kwargs)
         E = etree.Element("TABLE")
@@ -94,10 +95,14 @@ class GrapheMPM():
              à côte
         :type presentation: int
         """
+        # calcul du nombre de chiffres max après la virgule pour arrondir
+        # ensuite
+        self.prec=max([len(str(v).partition(".")[2]) for v in pond.values()])
+        self.ponderation = dict([(k, self._nb(str(e))) for k,e in pond.items()])
+        
         if succ:
             self.successeurs = succ
             # sommets: set(succ.keys())
-            self.ponderation = pond
             self.sommets = {}
             for k in succ.keys():
                 self.sommets[k] = noeud(k,presentation=presentation)
@@ -118,7 +123,6 @@ class GrapheMPM():
         elif pred:
             self.predecesseurs = pred
             # sommets: set(succ.keys())
-            self.ponderation = pond
             self.sommets = {}
             for k in pred.keys():
                 self.sommets[k] = noeud(k,presentation=presentation)
@@ -185,20 +189,36 @@ class GrapheMPM():
         D1 = [ (self.num_sommets[k], v) for k,v in D.items()]
         self.niveaux = dict(D1)
         
-    def col_is_null(self,M, i):
+    def col_is_null(self, M, i):
         """la colonne i de M est-elle nulle?"""
         return sum(M[:,i])==0
 
+    def _nb(self, s):
+        """convertir la chaîne de caractère s en nombre int ou float
+        si s contient un . on renvoie un numpy.float_ sinon un int
+        """
+        return (float_(s) if "." in s else int(s))
+
+    def _pretty(self, n):
+        """convertir un nombre n en string selon qu'il soit int ou float_
+        en tenant compte de la précision calculée dans self.prec dans __init__
+        """
+        if n==floor(n): # n est int
+            return str(n)
+        else:
+            return str(round(n, self.prec))
+    
     def earliestdate(self):
         """màj des données de ed des nœuds"""
         Ltmp = list(self.niveaux.items())
         L = sorted(Ltmp, key=lambda e:e[1]) # tri sur niveau
         for s,n in L:
             # on ajoute le poids de la tâche précédente e
-            poids_pred = [int(self.sommets[e].data["ed"])+self.ponderation[e]
+            poids_pred = [self._nb(self.sommets[e].data["ed"])
+                          +self.ponderation[e]
                           for e in self.predecesseurs[s]]
             m = (max(poids_pred) if len(poids_pred)>0 else 0)
-            self.sommets[s].setdata(ed=str(m))
+            self.sommets[s].setdata(ed=self._pretty(m))
 
     def latestdate(self):
         """màj des données de ld des nœuds, à faire après earliestdate()
@@ -208,17 +228,19 @@ class GrapheMPM():
         L.reverse() # en ordre décroissant
         for s,n in L:
             # on soustrait le poids de la tâche actuelle s
-            poids_suc = [int(self.sommets[e].data["ld"])-self.ponderation[s]
+            poids_suc = [self._nb(self.sommets[e].data["ld"])
+                         -self.ponderation[s]
                          for e in self.successeurs[s]]
             ld = (min(poids_suc) if len(poids_suc)>0 else
-                  self.sommets[s].data["ed"])
-            self.sommets[s].setdata(ld=str(ld))
+                  self._nb(self.sommets[s].data["ed"]))
+            self.sommets[s].setdata(ld=self._pretty(ld))
             # on en profite pour faire la marge libre
-            tmp =[int(self.sommets[e].data["ed"])-self.ponderation[s]\
-                  -int(self.sommets[s].data["ed"])
+            tmp =[self._nb(self.sommets[e].data["ed"])-self.ponderation[s]\
+                  -self._nb(self.sommets[s].data["ed"])
                       for e in self.successeurs[s]]
             ml = (min(tmp) if len(tmp)>0 else 0) #self.sommets[s].data["ed"]
             #marge totale
-            mt = int(self.sommets[s].data["ld"])-int(self.sommets[s].data["ed"])
-            self.sommets[s].setdata(mt=str(mt), ml=str(ml))
+            mt = self._nb(self.sommets[s].data["ld"])
+            -self._nb(self.sommets[s].data["ed"])
+            self.sommets[s].setdata(mt=self._pretty(mt), ml=self._pretty(ml))
 
