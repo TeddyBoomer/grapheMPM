@@ -240,7 +240,7 @@ class GrapheMPM():
                       for e in self.successeurs[s]]
             ml = (min(tmp) if len(tmp)>0 else 0) #self.sommets[s].data["ed"]
             #marge totale
-            mt = self._nb(self.sommets[s].data["ld"])
-            -self._nb(self.sommets[s].data["ed"])
+            mt = self._nb(self.sommets[s].data["ld"])\
+                 -self._nb(self.sommets[s].data["ed"])
             self.sommets[s].setdata(mt=self._pretty(mt), ml=self._pretty(ml))
 
