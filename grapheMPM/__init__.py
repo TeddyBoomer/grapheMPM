@@ -36,14 +36,13 @@ class noeud():
         ti = etree.SubElement(T1, "TD")
         ti.text = self.titre
         ti.attrib["COLSPAN"]= str(2)
+        ti.attrib["PORT"]="here"
 
         T2 = etree.SubElement(E,"TR")
         t21 = etree.SubElement(T2, "TD")
         t21.text=self.data["ed"]
-        t21.attrib["PORT"]="to"
         t22 = etree.SubElement(T2, "TD")
         t22.text=self.data["ld"]
-        t22.attrib["PORT"]="from"
         if self.presentation==1:
             T3 = etree.SubElement(E,"TR")
             t31 = etree.SubElement(T3, "TD")
@@ -164,7 +163,7 @@ class GrapheMPM():
         for k,L in self.successeurs.items():
             for i in list(L):
                 dot.edge(k, i, label=str(self.ponderation[k]),
-                         tailport="from", headport="to")
+                         tailport="here", headport="here")
         self.gv = dot
 
     def setlevel(self):
