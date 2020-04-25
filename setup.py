@@ -14,7 +14,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.4.1",
+    version="0.5",
     description="a bunch of classes to generate MPM graphs",
     long_description=long_description,
 
@@ -23,7 +23,7 @@ setup(
 
     # Author details
     author='B.M.',
-    author_email='teddy_boomer@yahoo.fr',
+    author_email='teddy_boomer at yahoo.fr',
 
     # Choose your license
     license='GNU GPL v3',
@@ -49,6 +49,8 @@ setup(
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     # What does your project relate to?
