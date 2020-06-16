@@ -5,6 +5,8 @@ grapheMPM
 
 * [Téléchargement](https://github.com/TeddyBoomer/grapheMPM/releases)
 
+* **commandes d'installation**: voir tout en bas de cette page.
+
 Des objets python pour implémenter la méthode des potentiels Métra MPM
 d'ordonnancement.
 
@@ -21,14 +23,15 @@ La classe `GrapheSimple` comporte:
 
 La classe `GrapheMPM` hérite des attributs et méthodes de `GrapheSimple` avec en plus:
 
-* le dictionnaire des `niveaux` (à créer avec la méthode `setlevel`),
+* le dictionnaire des `niveaux`,
 * les méthodes `earliestdate`, `latestdate` pour remplir les dates
+* une méthode `setlevel` pour calculer les niveaux des sommets (utilisée en interne dans la classe)
  
 dépendances:
 ============
 
-* modules python: Graphviz, lxml, numpy
-* logiciel Graphviz
+* modules python: Graphviz, lxml, numpy — installés automatiquement
+* logiciel [Graphviz](https://graphviz.org/) — à installer vous-même.
 
 Illustration de principe:
 =========================
@@ -37,6 +40,7 @@ graphe GrapheMPM
 ----------------
 
 **Nouveau (v>=0.5)**: plus besoin de renseigner des sommets 'début' et 'fin'
+
 **Nouveau (v>=0.4)**: Les poids peuvent être des décimaux.
 
 On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs ou des prédecesseurs et un dictionnaire des pondérations.
@@ -46,16 +50,20 @@ from grapheMPM import GrapheMPM
 
 # dico des prédecesseurs
 p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
-"F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
+     "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "K": "I"}
 # dico des pondérations
 w = {"A": 7, "B": 3, "C": 4.1, "D": 2.3, "E": 8,
-"F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
+     "F": 6, "G": 5, "H": 7, "I": 5, "J": 3, "K": 3.5}
+
 G = GrapheMPM(pred=p, pond=w)
-G.setlevel()
 G.earliestdate()
 G.makeGraphviz()
 G.gv.render("ex-ed")
+G.gv.format("svg")
+G.gv.render("ex-full")
 ```
+L'avant dernière ligne permet de changer le format d'image à svg plutôt que png.
+
 <img src="ex-ed.png" width="500">
 
 ```python
@@ -83,6 +91,8 @@ nommés:
 
 La méthode `setlevel` applique l'algorithme de recherche des niveaux à partir
 de l'observation des colonnes nulles de la matrice d'adjacence `mat_adj`.
+**v>=0.5.1** : elle est directement utilisée dans l'initialisation d'un grapheMPM; 
+vous n'avez plus besoin de l'appeler.
 
 Les méthodes `earliestdate, latestdate` mettent à jour les dates des nœuds et
 doivent être appliquées dans le bon ordre.
@@ -107,8 +117,9 @@ fermeture transitive.
 from grapheMPM import GrapheSimple
 
 # dico des prédecesseurs
+# dico des prédecesseurs
 p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
-"F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
+     "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "K": "I"}
 
 G = GrapheSimple(pred=p)
 G.makeGraphviz()
@@ -122,24 +133,27 @@ print(G.mat2tex(G.mat_adj))
 
 ```latex
 \begin{pmatrix}
-  0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
-  0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
-  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
-  0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
-  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
 \end{pmatrix}
 ```
 
-<img src="ex-simple.png" width="500"> <img src="ex-simple-full.png" width="500">
+Vous pourrez observer que graphviz ne met pas forcément les sommets sur le niveau 
+attendu si on ne le force pas (sommet C):
 
+<img src="ex-simple.png" width="500"> <img src="ex-simple-full.png" height="500">
 
-Installation
-============
+Installation ou mise à jour
+===========================
 
 Module en Python3. Il vous est conseillé d'utiliser une
 version de Python >=3.4. En effet, à partir de là, l'installateur pip
@@ -159,3 +173,6 @@ Pour linux:
 ```
 pip3 install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
+
+Pour mettre à jour quand on a déjà le module, on peut ajouter un paramètre `-U`
+ou `--upgrade` pour accepter la version la plus récente.

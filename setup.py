@@ -14,7 +14,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.5",
+    version="0.5.1",
     description="a bunch of classes to generate MPM graphs",
     long_description=long_description,
 
@@ -45,16 +45,10 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-    ],
+        'Programming Language :: Python :: 3+'],
 
     # What does your project relate to?
-    keywords='html graphviz',
+    keywords='python graphviz scheduling graph',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -78,15 +72,6 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    #  package_data={
-    #      'refnumtool':['data/doc/html/*.html',
-    #                    'data/doc/html/*.js',
-    #                    'data/doc/html/_images/*',
-    #                    'data/doc/html/_modules/*.html',
-    #                    'data/doc/html/_sources/*','data/doc/html/_static/*',
-    #                    'data/doc/html/_modules/refnumtool/*']
-    #  },
-    #  scripts = ['scripts/run_refnumtool.sh','scripts/run_refnumtool.bat'],
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.
     # see http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files

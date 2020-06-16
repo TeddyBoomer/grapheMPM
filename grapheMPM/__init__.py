@@ -6,10 +6,10 @@ from lxml import etree
     Module de manipulation de graphes pour ordonnancement
 
 .. py:class:: noeud
-    objet de description d'un nœud MPM sous forme d'un 
+    objet de description d'un nœud MPM sous forme d'un
     dictionnaire, rendu par un tableau html dans le graphe.
 .. py:class:: GrapheSimple
-    un graphe orienté simple, avec matrice 
+    un graphe orienté simple, avec matrice
     d'adjacence et de fermeture transitives (export tex possible)
 .. py:class:: GrapheMPM
     fils de GrapheSimple, avec méthodes de remplissage
@@ -18,7 +18,7 @@ from lxml import etree
 
 class noeud():
     def __init__(self, titre, presentation=1, **kwargs):
-        """initialisation d'un nœud dans un graphe MPM 
+        """initialisation d'un nœud dans un graphe MPM
         (potentiels Metra)
 
         les kwargs contiennent:
@@ -27,7 +27,7 @@ class noeud():
         ml: marge libre
         mt: marge totale
 
-        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml-mt 
+        :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml-mt
         côte à côte
         :type presentation: int
         """
@@ -80,7 +80,7 @@ class noeud():
 
 
 class GrapheSimple():
-    """Classe de génération d'un graphe orienté simple avec calcul de la 
+    """Classe de génération d'un graphe orienté simple avec calcul de la
     matrice d'adjacence et export tex
 
     :successeurs: dict des successeurs
@@ -175,7 +175,7 @@ class GrapheSimple():
         """générer l'objet graphviz
 
         :rtype: None
-        :param fermeture: indique si on relie avec la fermeture 
+        :param fermeture: indique si on relie avec la fermeture
         transitive
         :type fermeture: bool
         """
@@ -186,11 +186,11 @@ class GrapheSimple():
 
         for k in self.successeurs.keys():
             dot.node(k)
-        
+
         # for k,L in self.successeurs.items():
         #     for i in list(L):
         #         dot.edge(k, i)
-        choix = {True: self.mat_ferm_transitive, False: self.mat_adj}  
+        choix = {True: self.mat_ferm_transitive, False: self.mat_adj} 
         N = len(self.successeurs) #nb de sommets
         for i in range(N):
             for j in range(N):
@@ -202,10 +202,10 @@ class GrapheSimple():
 
 
 class GrapheMPM(GrapheSimple):
-    """Classe de génération d'un graphe d'ordonnancement par les 
+    """Classe de génération d'un graphe d'ordonnancement par les
     potentiels Métra.
 
-    Initialisation possible via (successeurs ou prédécesseur ) et 
+    Initialisation possible via (successeurs ou prédécesseur ) et
     pondérations.
     Inutile de mettre les nœuds de début et de fin
 
@@ -216,12 +216,13 @@ class GrapheMPM(GrapheSimple):
     >>>w = {"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
        "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
     >>>G = GrapheMPM(pred=p, pond=w)
-    >>>G.setlevel()
     >>>G.earliestdate()
     >>>G.makeGraphviz()
     >>>G.gv.render("ex-ed")
     >>>G.latestdate()
     >>>G.makeGraphviz()
+    >>>G.gv.render("ex-full")
+    >>>G.gv.format("svg")
     >>>G.gv.render("ex-full")
     """
 
@@ -244,16 +245,26 @@ class GrapheMPM(GrapheSimple):
         # ensuite
         self.prec = max([len(str(v).partition(".")[2])
                          for v in pond.values()])
-        self.ponderation = dict([(k, self._nb(str(e)))
-                                 for k, e in pond.items()])
+        self.ponderation = {k: self._nb(str(e)) for (k, e) in pond.items()}
 
         self.titre_debut = titre_debut
         self.titre_fin = titre_fin
         self.show_level = show_level
 
         make_node = lambda x: noeud(x, presentation=presentation)
+        # 1ere passe
         GrapheSimple.__init__(self, succ=succ, pred=pred,
                               make_node=make_node)
+        # ajouter le nœud de fin dans les algorithmes
+        self.setlevel()
+        N = max(self.niveaux.values()) # niveaux des dernières tâches
+        pred_full = self.predecesseurs
+        pred_full["fin"] = [e for e, v in self.niveaux.items() if v == N]
+        self.ponderation["fin"] = self._nb(str(0)) # poids nul pour "fin"
+        # 2ieme passe
+        GrapheSimple.__init__(self, pred=pred_full,
+                              make_node=make_node)
+        self.setlevel()
 
     def makeGraphviz(self):
         """générer l'objet graphviz
@@ -278,19 +289,11 @@ class GrapheMPM(GrapheSimple):
                         c.node(str(k), f"<{n.noeud}>")
                         # la str html doit être encadrée de <>
 
-        # branchement du nœud de départ et nœud de fin:
+        # branchement du nœud de départ:
         dot.node("debut", self.titre_debut, shape='ellipse')
-        with dot.subgraph(name=f"cluster_fin",
-                          node_attr={'rank': 'same'}) as c:
-            c.attr(style="invis") # désactivation du cadre de cluster
-            c.node("fin", self.titre_fin, shape='ellipse')
-            if self.show_level:
-                c.node("last", style='invis')
         for k, n in self.sommets.items(): # key, noeud
             if self.niveaux[k] == NIV[0]:
                 dot.edge("debut", k)
-            elif self.niveaux[k] == NIV[-1]:
-                dot.edge(k, "fin")
 
         # création des autres arcs, pondérés
         for k, L in self.successeurs.items():
@@ -308,11 +311,12 @@ class GrapheMPM(GrapheSimple):
     def setlevel(self):
         """calculer les niveaux des sommets
 
-        créer un attribut niveaux de type dict.
+        créer un attribut self.niveaux de type dict.
+        clé, valeur: nom du sommet, niveau
         :rtype: None
         """
         A = self.mat_adj.copy()
-        L = [(i+1) for i in range(len(A)) if self.col_is_null(A, i)]
+        L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
         c = 0 # compteur de niveau
         D = {} # dico des niveaux
         for e in L: # mise à jour niveau 0
@@ -321,7 +325,7 @@ class GrapheMPM(GrapheSimple):
             c += 1
             A *= self.mat_adj
             M = L
-            L = [(i+1) for i in range(len(A)) if self.col_is_null(A, i)]
+            L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
             # calcul des nv sommets sans pred
             delta = set(L).difference(set(M)) 
             for e in delta: # mise à jour niveau c
@@ -329,7 +333,7 @@ class GrapheMPM(GrapheSimple):
         D1 = [(self.num_sommets[k], v) for k, v in D.items()]
         self.niveaux = dict(D1)
 
-    def col_is_null(self, M, i):
+    def _col_is_null(self, M, i):
         """la colonne i de M est-elle nulle?
         """
         return sum(M[:, i]) == 0
@@ -342,13 +346,10 @@ class GrapheMPM(GrapheSimple):
 
     def _pretty(self, n):
         """convertir un nombre n en string selon qu'il soit int ou float_
- en tenant compte de la précision calculée dans self.prec 
-        dans __init__
+ en tenant compte de la précision calculée dans self.prec dans __init__
         """
-        if n == floor(n): # n est int
-            return str(n)
-        else:
-            return str(round(n, self.prec))
+        # cas d'un int ou pas
+        return (str(n) if n == floor(n) else str(round(n, self.prec)))
 
     def earliestdate(self):
         """màj des données de ed des nœuds
