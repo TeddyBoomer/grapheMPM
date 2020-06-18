@@ -60,7 +60,7 @@ G.earliestdate()
 G.makeGraphviz()
 G.gv.render("ex-ed")
 G.gv.format("svg")
-G.gv.render("ex-full")
+G.gv.render("ex-ed")
 ```
 L'avant dernière ligne permet de changer le format d'image à svg plutôt que png.
 
@@ -89,10 +89,10 @@ nommés:
 * au choix `pred` ou `succ` dictionnaire des prédécesseurs (resp. des successeurs)
 * `pond` dictionnaire des pondérations.
 
-La méthode `setlevel` applique l'algorithme de recherche des niveaux à partir
-de l'observation des colonnes nulles de la matrice d'adjacence `mat_adj`.
-**v>=0.5.1** : elle est directement utilisée dans l'initialisation d'un grapheMPM; 
-vous n'avez plus besoin de l'appeler.
+**Nouveau (version >=0.5.1)**: La méthode `setlevel` applique l'algorithme de
+recherche des niveaux à partir de l'observation des colonnes nulles de la
+matrice d'adjacence `mat_adj`. Elle est directement utilisée dans
+l'initialisation d'un grapheMPM; vous n'avez plus besoin de l'appeler.
 
 Les méthodes `earliestdate, latestdate` mettent à jour les dates des nœuds et
 doivent être appliquées dans le bon ordre.
