@@ -17,7 +17,7 @@ from lxml import etree
 """
 
 class noeud():
-    def __init__(self, titre, presentation=1, **kwargs):
+    def __init__(self, titre, presentation=1, marges=True, **kwargs):
         """initialisation d'un nœud dans un graphe MPM
         (potentiels Metra)
 
@@ -30,12 +30,15 @@ class noeud():
         :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml-mt
         côte à côte
         :type presentation: int
+        :param marges: afficher les cases de marges
+        :type marges: bool
         """
         self.data = {"ed": "    ", "ld": "    ",
                      "ml": "    ", "mt": "    "}
         self.data.update(kwargs)
         self.titre = titre
         self.presentation = presentation
+        self.marges = marges
         self.setdata(**kwargs)
 
     def setdata(self, **kwargs):
@@ -61,7 +64,7 @@ class noeud():
         t22 = etree.SubElement(T2, "TD")
         t22.text = self.data["ld"]
         #t22.attrib["PORT"]="from"
-        if self.presentation == 1:
+        if (self.presentation == 1) and self.marges:
             T3 = etree.SubElement(E, "TR")
             t31 = etree.SubElement(T3, "TD")
             t31.text = self.data["ml"]
@@ -70,7 +73,7 @@ class noeud():
             t41 = etree.SubElement(T4, "TD")
             t41.text = self.data["mt"]
             t41.attrib["COLSPAN"] = str(2)
-        elif self.presentation == 2:
+        elif (self.presentation == 2) and self.marges:
             T3 = etree.SubElement(E, "TR")
             t31 = etree.SubElement(T3, "TD")
             t31.text = self.data["ml"]
@@ -227,7 +230,8 @@ class GrapheMPM(GrapheSimple):
     """
 
     def __init__(self, succ=None, pred=None, pond=None, presentation=1,
-                 titre_debut="début", titre_fin="fin", show_level=False):
+                 titre_debut="début", titre_fin="fin", show_level=False,
+                 marges=True):
         """instanciation d'un graphe MPM
 
         2 possibilités d'initialisation avec l'un des dictionnaires
@@ -238,6 +242,8 @@ class GrapheMPM(GrapheSimple):
         :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml -mt côte
              à côte
         :type presentation: int
+        :param marges: afficher les cases des marges ou pas
+        :type marges: bool
         :param show_level: afficher les niveaux au dessus de chaque cluster
         :type show_level: bool
         """
@@ -251,7 +257,8 @@ class GrapheMPM(GrapheSimple):
         self.titre_fin = titre_fin
         self.show_level = show_level
 
-        make_node = lambda x: noeud(x, presentation=presentation)
+        make_node = lambda x: noeud(x, presentation=presentation,
+                                    marges=marges)
         # 1ere passe
         GrapheSimple.__init__(self, succ=succ, pred=pred,
                               make_node=make_node)

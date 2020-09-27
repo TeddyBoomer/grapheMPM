@@ -38,6 +38,7 @@ Illustration de principe:
 
 graphe GrapheMPM
 ----------------
+**Nouveau (v>=0.5.3)**: un paramètre booléen `marges` (`True`/`False`) pour indiquer d'afficher les cases des marges.
 
 **Nouveau (v>=0.5)**: plus besoin de renseigner des sommets 'début' et 'fin'
 
@@ -73,15 +74,23 @@ G.gv.render("ex-full")
 ```
 <img src="ex-full.png" width="500">
 
-**Nouveau (version >=0.3.3)**: un nouveau paramètre `presentation` (à 1 par
-défaut) permet de régler la répartition des marges (l'une sur l'autre ou côte à
-côte). Voici le graphe complet avec `presentation=2`:
+observation du paramètre `presentation` (à 1 par défaut) permet de régler la
+répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe
+complet avec `presentation=2`:
 
 ```python
 G = GrapheMPM(pred=p, pond=w, presentation=2)
 # […]
 ```
 <img src="ex-full-2.png" width="500">
+
+observation du paramètre booléen `marges` (à `True` par défaut)
+```python
+G = GrapheMPM(pred=p, pond=w, marges=False)
+# […]
+```
+<img src="ex-full-nomarge.png" width="500">
+
 
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
 nommés:
@@ -175,4 +184,9 @@ pip3 install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
 
 Pour mettre à jour quand on a déjà le module, on peut ajouter un paramètre `-U`
-ou `--upgrade` pour accepter la version la plus récente.
+ou `--upgrade` pour accepter la version la plus récente. exemple linux:
+
+```
+pip3 install -U  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
+```
+
