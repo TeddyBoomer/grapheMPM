@@ -263,10 +263,10 @@ class GrapheMPM(GrapheSimple):
         GrapheSimple.__init__(self, succ=succ, pred=pred,
                               make_node=make_node)
         # ajouter le nœud de fin dans les algorithmes
-        self.setlevel()
-        N = max(self.niveaux.values()) # niveaux des dernières tâches
+        # il faut lui relier tous les nœuds sans successeur
         pred_full = self.predecesseurs
-        pred_full["fin"] = [e for e, v in self.niveaux.items() if v == N]
+        pred_full["fin"] = [e for e, s in self.successeurs.items()
+                            if s in ['', []]]
         self.ponderation["fin"] = self._nb(str(0)) # poids nul pour "fin"
         # 2ieme passe
         GrapheSimple.__init__(self, pred=pred_full,
@@ -311,7 +311,6 @@ class GrapheMPM(GrapheSimple):
         if self.show_level:
             for N in NIV[:-1]:
                 dot.edge(f"niv{N}", f"niv{N+1}", style='invis')
-            dot.edge(f"niv{NIV[-1]}", "last", style='invis')
 
         self.gv = dot
 
