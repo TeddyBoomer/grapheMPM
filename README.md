@@ -165,7 +165,9 @@ print(G.tab_latex_succ)
 ```
 
 <table><tbody><tr>
-<td>```latex
+<td>
+
+```latex
 \begin{pmatrix}
   0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
@@ -179,8 +181,12 @@ print(G.tab_latex_succ)
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
 \end{pmatrix}
-```</td>
-<td>```latex
+```
+
+</td>
+<td>
+
+```latex
 \begin{tabular}{|c|c|}
 \toprule
 Sommet & Prédécesseur(s) \\
@@ -198,8 +204,12 @@ Sommet & Prédécesseur(s) \\
      K &               I \\
 \bottomrule
 \end{tabular}
-```</td>
-<td>```latex
+```
+
+</td>
+<td>
+
+```latex
 \begin{tabular}{|c|c|}
 \toprule
 Sommet & Successeur(s) \\
@@ -218,9 +228,7 @@ Sommet & Successeur(s) \\
 \bottomrule
 \end{tabular}
 ```
-</td>
-</tr></tbody>
-</table>
+</td></tr></tbody></table>
 
 **Astuce**: quand on oublie le nom des attributs disponibles, on peut lister le
 contenu de l'objet en tapant `dir(G)`.
