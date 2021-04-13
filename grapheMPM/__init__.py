@@ -1,24 +1,79 @@
 from numpy import matrix, prod, float_, round, floor, uint8
 from graphviz import Digraph
 from lxml import etree
-##***modif xavier***
-from sympy import latex,Matrix #j'utilise sympy parce qu'il comporte l'export latex pour le matrices, mais ta fonction mat2tex est très bien aussi. 
 from pandas import DataFrame
-##***Fin modif xavier***
+
 
 """.. py:module:: graphMPM
     Module de manipulation de graphes pour ordonnancement
 
+.. py:function:: tab_latex
+    Générer la version latex d'un tableau 2d.
+
+.. py:function:: mat2tex
+    Générer la version latex pmatrix d'une matrice.
+
 .. py:class:: noeud
     objet de description d'un nœud MPM sous forme d'un
     dictionnaire, rendu par un tableau html dans le graphe.
+
 .. py:class:: GrapheSimple
-    un graphe orienté simple, avec matrice
-    d'adjacence et de fermeture transitives (export tex possible)
+    un graphe orienté simple, avec matrice d'adjacence, ses puissances et la
+    matrice fermeture transitives ainsi que leur version latex
+
 .. py:class:: GrapheMPM
     fils de GrapheSimple, avec méthodes de remplissage
     des dates au plus tôt et au plus tard.
 """
+
+def tab_latex(t:dict, p:bool)->str:
+    """vers la version latex du tableau des prédécesseurs/successeurs.
+
+    il est intéressant de disposer des versions latex des tableaux des
+    successeurs et des prédécesseurs.
+    il arrive que les valeurs soient sous forme de liste dans les
+    prédécesseurs par exemple:{'1': ['1'], '2': ['1', '2', '3'], '3': ['2',
+    '3'], '4': ['1', '4', '5'], '5': ['4', '5']}. on les remet sous forme
+    de chaine.
+
+    :param t: dictionnaire à traiter
+    :param p: booléen d'activation si c'est le tableau des prédecesseurs
+    """
+    for i in t.keys():
+        if isinstance(t[i], list):
+            ch = ''.join(t[i])
+            t.update({i:ch})
+    t = sorted(t.items(), key=lambda t: t[0])
+    T = [ list(x) for x in t ]
+    columns_labels = ["Sommet",
+                      ("Prédécesseur(s)" if p else "Successeur(s)")]
+    df = DataFrame(T, columns=columns_labels)
+    return df.to_latex(index=False, column_format='|'+2*'c|')
+
+
+def mat2tex(M):
+    """construire la version tex d'une matrice, avec jolis retours
+    à la ligne pour un pretty print.
+
+    src: stackoverflow.com - numpy-2d-and-1d-array-to-latex-bmatrix
+    :returns: LaTeX pmatrix as a string
+    :param M: matrice
+    :type M: numpy matrix
+
+    Exemple::
+
+    >>> mat2tex(G.mat_adj)
+    >>> mat2tex(G.mat_ferm_transitive)
+
+    """
+    if len(M.shape) > 2:
+        raise ValueError('pmatrix can at most display two dimensions')
+    lines = str(M).replace('[', '').replace(']', '').splitlines()
+    rv = [r'\begin{pmatrix}']
+    rv += ['  ' + ' & '.join(l.split()) + r'\\' for l in lines]
+    rv += [r'\end{pmatrix}']
+    return '\n'.join(rv)
+
 
 class noeud():
     def __init__(self, titre, presentation=1, marges=True, **kwargs):
@@ -92,15 +147,33 @@ class GrapheSimple():
 
     :successeurs: dict des successeurs
     :predecesseurs: dict des prédecesseurs
+    :tab_latex_pred: str du tableau latex des prédecesseurs
+    :tab_latex_succ: str du tableau latex des successeurs
     :mat_adj: matrix matrice d'adjacence
     :mat_ferm_transitive: matrix matrice de fermeture transitive
 
     Exemple::
 
-    >>>p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
+    >>> p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
        "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
-    >>>GS = GrapheSimple(pred=p)
-    >>>GS.mat2tex(G.mat_ferm_transitive)
+    >>> GS = GrapheSimple(pred=p)
+    >>> print(mat2tex(GS.mat_ferm_transitive))
+    \begin{pmatrix}
+      0 & 0 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 1\\
+      0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1\\
+      0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1\\
+      0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+    \end{pmatrix}
+    >>> GS.Matrices_latex[O] # équivalent à ligne précédente
+    >>> GS.Matrices_latex
+    >>> print(GS.tab_latex_pred)
+
     """
 
     def __init__(self, succ=None, pred=None, make_node=str):
@@ -146,33 +219,6 @@ class GrapheSimple():
                       if self.mat_adj[i-1, j] != 0]
                 S[d[i]] = pi
             self.successeurs = S
-            
-        ##***modif xavier***
-        ## il est intéressant de disposer des versions latex des tableaux des successeurs et des prédécesseurs
-        def tab_latex(t:dict,p:bool)->str: #cette fonction sort la version latex du tableau des prédécesseurs ou des successeurs . 
-            #il arrive que les valeurs soient sous forme de liste dans les prédécesseurs par exemple:{'1': ['1'], '2': ['1', '2', '3'], '3': ['2', '3'], '4': ['1', '4', '5'], '5': ['4', '5']}. on les remet sous forme de chaine
-            for i in t.keys():
-                ch = ''
-                for j in t[i]:
-                    ch += j
-                t.update({i:ch})
-            t = sorted(t.items(), key=lambda t: t[0])#on réordonne éventuellement 
-            T=[]
-            if p:
-                columns_labels=["Sommet","Prédécesseur(s)"]
-            else:
-                columns_labels=["Sommet","Successeur(s)"]
-            for x in t:
-                T.append([x[0],x[1]])
-            df = DataFrame(T, columns=columns_labels)
-            return df.to_latex(index=False,column_format='|'+2*'c|')
-        
-        ## Pour les prédécesseurs et les successeurs:
-        self.tab_latex_pred = tab_latex(self.predecesseurs,True)
-        self.tab_latex_succ = tab_latex(self.successeurs,False)
-        
-        ## Fin modif xavier***
-
 
         # construction mat. de ferm. transitive
         Mtmp = self.mat_adj.copy()
@@ -180,40 +226,17 @@ class GrapheSimple():
         for i in range(len(self.sommets)-1): # on a déjà la puissance 1
             Mtmp = Mtmp*self.mat_adj # mutip normale dans numpy
             Puissances.append(Mtmp)
-
         # somme puissances, comp bool, conversion en int la plus simple
         self.mat_ferm_transitive = (sum(Puissances) > 0).view(dtype=uint8)
-        
-        ##***modif xavier***
-        ##***ajout de deux méthodes: Matrices pour récupérer toutes les matrices au format numpy et Matrices_latex pour les avoir au format latex.Le premier élément contient la matrice de fermeture transitive.***
-        Puissances.insert(0,self.mat_ferm_transitive)
+        # Xavier: insertion de la mat de ferm. transit au début
+        Puissances.insert(0, self.mat_ferm_transitive)
         self.Matrices = Puissances
-        Puissances_latex =[]
-        for M in Puissances:
-            Puissances_latex.append(latex(Matrix(M),mat_delim='('))
-        self.Matrices_latex = Puissances_latex
-        ##***Fin modif xavier***
-    def mat2tex(self, M):
-        """construire la version tex de la matrice d'adjacence
-
-        src: stackoverflow.com - numpy-2d-and-1d-array-to-latex-bmatrix
-        :returns: LaTeX pmatrix as a string
-        :param M: matrice
-        :type M: numpy matrix
-
-        Exemple::
-
-        >>>G.mat2tex(G.mat_adj)
-        >>>G.mat2tex(G.mat_ferm_transitive)
-        """
-        if len(M.shape) > 2:
-            raise ValueError('pmatrix can at most display two dimensions')
-        lines = str(M).replace('[', '').replace(']', '').splitlines()
-        rv = [r'\begin{pmatrix}']
-        rv += ['  ' + ' & '.join(l.split()) + r'\\' for l in lines]
-        rv += [r'\end{pmatrix}']
-        return '\n'.join(rv)
-
+        #Puissances_latex =[ latex(Matrix(M),mat_delim='(') for M in Puissances ]
+        self.Matrices_latex =[ mat2tex(M) for M in Puissances ]
+        ## tableaux latex pour les prédécesseurs et les successeurs:
+        self.tab_latex_pred = tab_latex(self.predecesseurs, True)
+        self.tab_latex_succ = tab_latex(self.successeurs, False)
+    
     def makeGraphviz(self, fermeture=False):
         """générer l'objet graphviz
 
@@ -230,22 +253,15 @@ class GrapheSimple():
         for k in self.successeurs.keys():
             dot.node(k)
 
-        # for k,L in self.successeurs.items():
-        #     for i in list(L):
-        #         dot.edge(k, i)
-        choix = {True: self.mat_ferm_transitive, False: self.mat_adj} 
+        choix = {True: self.mat_ferm_transitive, False: self.mat_adj}
         N = len(self.successeurs) #nb de sommets
         for i in range(N):
             for j in range(N):
                 if choix[fermeture][i, j]:
-                    ##***modif xavier***
-                    if choix[not fermeture][i,j]:
-                        couleur = 'black'
-                    else:
-                        couleur = 'red'
+                    # à méditer: arc noir si on n'est pas dans la fermeture tr.
+                    couleur = ('black' if choix[not fermeture][i,j] else 'red')
                     dot.edge(self.num_sommets[i+1],
-                         self.num_sommets[j+1],color = couleur)
-                    ##***Fin modif xavier***
+                         self.num_sommets[j+1], color=couleur)
         self.gv = dot
 
 
@@ -259,24 +275,24 @@ class GrapheMPM(GrapheSimple):
 
     Exemple::
 
-    >>>p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
+    >>> p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
        "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
-    >>>w = {"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
+    >>> w = {"A": 7, "B": 3, "C": 4, "D": 2, "E": 8,
        "F": 6, "G": 5, "H": 7, "I": 5, "J": 3}
-    >>>G = GrapheMPM(pred=p, pond=w)
-    >>>G.earliestdate()
-    >>>G.makeGraphviz()
-    >>>G.gv.render("ex-ed")
-    >>>G.latestdate()
-    >>>G.makeGraphviz()
-    >>>G.gv.render("ex-full")
-    >>>G.gv.format("svg")
-    >>>G.gv.render("ex-full")
+    >>> G = GrapheMPM(pred=p, pond=w)
+    >>> G.earliestdate()
+    >>> G.makeGraphviz()
+    >>> G.gv.render("ex-ed")
+    >>> G.latestdate()
+    >>> G.makeGraphviz()
+    >>> G.gv.render("ex-full")
+    >>> G.gv.format("svg")
+    >>> G.gv.render("ex-full")
     """
 
     def __init__(self, succ=None, pred=None, pond=None, presentation=1,
                  titre_debut="début", titre_fin="fin", show_level=False,
-                 marges=True):
+                 marges=False):
         """instanciation d'un graphe MPM
 
         2 possibilités d'initialisation avec l'un des dictionnaires
@@ -287,10 +303,12 @@ class GrapheMPM(GrapheSimple):
         :param presentation: in [1,2] choisir 1: ml sur mt, 2: ml -mt côte
              à côte
         :type presentation: int
-        :param marges: afficher les cases des marges ou pas
+        :param marges: afficher les cases des marges ou pas (désactivé par
+        défaut)
         :type marges: bool
         :param show_level: afficher les niveaux au dessus de chaque cluster
         :type show_level: bool
+
         """
         # calcul du nombre de chiffres max après la virgule pour arrondir
         # ensuite
@@ -378,7 +396,7 @@ class GrapheMPM(GrapheSimple):
             M = L
             L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
             # calcul des nv sommets sans pred
-            delta = set(L).difference(set(M)) 
+            delta = set(L).difference(set(M))
             for e in delta: # mise à jour niveau c
                 D[e] = c
         D1 = [(self.num_sommets[k], v) for k, v in D.items()]
@@ -396,11 +414,11 @@ class GrapheMPM(GrapheSimple):
         return float_(s) if "." in s else int(s)
 
     def _pretty(self, n):
-        """convertir un nombre n en string selon qu'il soit int ou float_
- en tenant compte de la précision calculée dans self.prec dans __init__
+        """convertir un nombre n en string selon qu'il soit int ou float_ en 
+        tenant compte de la précision calculée dans self.prec dans __init__
         """
         # cas d'un int ou pas
-        return (str(n) if n == floor(n) else str(round(n, self.prec)))
+        return str(n) if n == floor(n) else str(round(n, self.prec))
 
     def earliestdate(self):
         """màj des données de ed des nœuds
