@@ -39,12 +39,15 @@ def tab_latex(t:dict, p:bool)->str:
     :param t: dictionnaire à traiter
     :param p: booléen d'activation si c'est le tableau des prédecesseurs
     """
-    for i in t.keys():
-        if isinstance(t[i], list):
-            ch = ''.join(t[i])
-            t.update({i:ch})
-    t = sorted(t.items(), key=lambda t: t[0])
-    T = [ list(x) for x in t ]
+    # attention on travaille sur une copie du dictionnaire
+    # sinon cela modifie l'original dans l'objet GrapheSimple…
+    tmp = t.copy()
+    for i in tmp.keys():
+        if isinstance(tmp[i], list):
+            ch = ''.join(tmp[i])
+            tmp.update({i:ch})
+    tmp = sorted(tmp.items(), key=lambda x: x[0])
+    T = [ list(x) for x in tmp ]
     columns_labels = ["Sommet",
                       ("Prédécesseur(s)" if p else "Successeur(s)")]
     df = DataFrame(T, columns=columns_labels)

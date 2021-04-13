@@ -3,41 +3,53 @@ grapheMPM
 
 * [page Github](https://github.com/TeddyBoomer/grapheMPM)
 
-* [Téléchargement](https://github.com/TeddyBoomer/grapheMPM/releases)
+* [Téléchargement (page des releases)](https://github.com/TeddyBoomer/grapheMPM/releases)
 
 * **commandes d'installation**: voir tout en bas de cette page.
 
 Des objets python pour implémenter la méthode des potentiels Métra MPM
 d'ordonnancement.
 
-La classe `GrapheSimple` comporte:
+## La classe `GrapheSimple` comporte:
 
-* le dictionnaire des `successeurs`
-* celui des `predecesseurs`,
-* la matrice d'adjacence `mat_adj`,
-* la matrice de fermeture transitive `mat_ferm_transitive`,
-* une méthode `mat2tex` pour afficher l'export LaTeX d'une matrice (objet pmatrix)
+* le dictionnaire `GrapheSimple.successeurs`
+* le dictionnaire `GrapheSimple.predecesseurs`,
+* matrices liées au graphe de type `numpy.matrix`:
+  - la matrice d'adjacence `GrapheSimple.mat_adj`,
+  - la matrice de fermeture transitive `GrapheSimple.mat_ferm_transitive`,
+  - la liste des puissances de la matrice d'adjacence `GrapheSimple.Matrices`. La 1ere est celle de la matrice de fermeture transitive.
+  - la liste de leur export latex `GrapheSimple.Matrices_latex`
+* export latex du tableau des prédecesseurs `GrapheSimple.tab_latex_pred`
+* export latex du tableau des successeurs `GrapheSimple.tab_latex_succ`
 * le dictionnaire `num_sommets` pour lier leur nom à leur emplacement dans la matrice d'adjacence,
 * l'objet `gv` qui est sa traduction Graphviz (à créer et recharger par la méthode `makeGraphviz`)
 (on peut générer le graphe normal ou complété avec la fermeture transitive)
 
-La classe `GrapheMPM` hérite des attributs et méthodes de `GrapheSimple` avec en plus:
+## La classe `GrapheMPM` hérite des attributs et méthodes de `GrapheSimple` avec en plus:
 
 * le dictionnaire des `niveaux`,
 * les méthodes `earliestdate`, `latestdate` pour remplir les dates
 * une méthode `setlevel` pour calculer les niveaux des sommets (utilisée en interne dans la classe)
+
+deux fonctions techniques sont présentes dans le module:
+
+* fonction `mat2tex` pour afficher l'export LaTeX d'une matrice (objet pmatrix)
+* fonction `tab_latex` pour convertir les dictionnaires des prédecesseurs et successeurs en latex.
  
 dépendances:
 ============
 
-* modules python: Graphviz, lxml, numpy — installés automatiquement
+* modules python: Graphviz, lxml, numpy, pandas — installés automatiquement
 * logiciel [Graphviz](https://graphviz.org/) — à installer vous-même.
 
 Illustration de principe:
 =========================
 
-graphe GrapheMPM
+objet GrapheMPM
 ----------------
+**Nouveau (v>=0.6)**: puissances de la matrice d'adjacence (en numpy et en latex) disponibles
+  par défaut, les marges ne sont plus affichées.
+
 **Nouveau (v>=0.5.3)**: un paramètre booléen `marges` (`True`/`False`) pour indiquer d'afficher les cases des marges.
 
 **Nouveau (v>=0.5)**: plus besoin de renseigner des sommets 'début' et 'fin'
@@ -56,27 +68,28 @@ p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
 w = {"A": 7, "B": 3, "C": 4.1, "D": 2.3, "E": 8,
      "F": 6, "G": 5, "H": 7, "I": 5, "J": 3, "K": 3.5}
 
-G = GrapheMPM(pred=p, pond=w)
+G = GrapheMPM(pred=p, pond=w, marges=False) # par défaut marges=False
 G.earliestdate()
 G.makeGraphviz()
-G.gv.render("ex-ed")
+G.gv.render("ex-ed-nomarge")
 G.gv.format("svg")
-G.gv.render("ex-ed")
+G.gv.render("ex-ed-nomarge")
 ```
 L'avant dernière ligne permet de changer le format d'image à svg plutôt que png.
 
-<img src="ex-ed.png" width="500">
+<img src="ex-ed-nomarge.png" width="500">
 
 ```python
 G.latestdate()
 G.makeGraphviz()
-G.gv.render("ex-full")
+G.gv.render("ex-full-nomarge")
 ```
-<img src="ex-full.png" width="500">
+<img src="ex-full-nomarge.png" width="500">
 
 observation du paramètre `presentation` (à 1 par défaut) permet de régler la
 répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe
-complet avec `presentation=2`:
+complet avec `presentation=1` puis `presentation=2`:
+
 
 ```python
 G = GrapheMPM(pred=p, pond=w, presentation=2)
@@ -84,12 +97,11 @@ G = GrapheMPM(pred=p, pond=w, presentation=2)
 ```
 <img src="ex-full-2.png" width="500">
 
-observation du paramètre booléen `marges` (à `True` par défaut)
 ```python
-G = GrapheMPM(pred=p, pond=w, marges=False)
+G = GrapheMPM(pred=p, pond=w, presentation=2)
 # […]
 ```
-<img src="ex-full-nomarge.png" width="500">
+<img src="ex-full-2.png" width="500">
 
 
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
@@ -98,11 +110,6 @@ nommés:
 * au choix `pred` ou `succ` dictionnaire des prédécesseurs (resp. des successeurs)
 * `pond` dictionnaire des pondérations.
 
-**Nouveau (version >=0.5.1)**: La méthode `setlevel` applique l'algorithme de
-recherche des niveaux à partir de l'observation des colonnes nulles de la
-matrice d'adjacence `mat_adj`. Elle est directement utilisée dans
-l'initialisation d'un grapheMPM; vous n'avez plus besoin de l'appeler.
-
 Les méthodes `earliestdate, latestdate` mettent à jour les dates des nœuds et
 doivent être appliquées dans le bon ordre.
 
@@ -110,17 +117,30 @@ doivent être appliquées dans le bon ordre.
 l'initialisation, mais ça ne fait pas forcément un bon rendu, les sommets étant
 mélangés dans les niveaux; c'est graphviz qui les organise.
 
-graphe `GrapheSimple`
+**Astuce d'orientation**: pour les plus téméraires, vous pouvez choisir
+l'orientation du graphe au moment du rendu. Il suffit de préciser la valeur de
+l'attribut `rankdir` pour `.gv` qui vaut `LR` (left-right) par défaut:
+
+```
+G.gv.attr(rankdir="TB") # top-bottom
+G.gv.attr(rankdir="BT") # bottom-top
+G.gv.attr(rankdir="RL") # right-left
+```
+<table>
+ <tbody><tr>
+  <td><img src="ex-ed-nomarge-TB.png" width="300"></td>
+  <td><img src="ex-ed-nomarge-BT.png" width="300"></td>
+  <td><img src="ex-ed-nomarge-RL.png" width="400"></td>
+</tr></tbody>
+</table>
+
+objet `GrapheSimple`
 ---------------------
 
 C'est une classe plus simple à charger simplement avec un dictionnaire des
 prédecesseurs ou des successeurs.
 
-L'objet construit les deux dictionnaires, la matrice d'adjacence et celle de
-fermeture transitive.
-
-* On peut exporter les matrices au format LaTeX (pmatrix)
-* On peut générer le graphe simple, ou sa version complète avec fermeture transitive.
+On peut générer le graphe simple, ou sa version complète avec fermeture transitive.
 
 ```python
 from grapheMPM import GrapheSimple
@@ -155,6 +175,10 @@ print(G.mat2tex(G.mat_adj))
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
 \end{pmatrix}
 ```
+
+**Astuce**: quand on oublie le nom des attributs disponibles, on peut lister le
+contenu de l'objet en tapant `dir(G)`.
+
 
 Vous pourrez observer que graphviz ne met pas forcément les sommets sur le niveau 
 attendu si on ne le force pas (sommet C):
