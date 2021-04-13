@@ -92,10 +92,10 @@ complet avec `presentation=1` puis `presentation=2`:
 
 
 ```python
-G = GrapheMPM(pred=p, pond=w, presentation=2)
+G = GrapheMPM(pred=p, pond=w, presentation=1)
 # […]
 ```
-<img src="ex-full-2.png" width="500">
+<img src="ex-full.png" width="500">
 
 ```python
 G = GrapheMPM(pred=p, pond=w, presentation=2)
@@ -143,7 +143,7 @@ prédecesseurs ou des successeurs.
 On peut générer le graphe simple, ou sa version complète avec fermeture transitive.
 
 ```python
-from grapheMPM import GrapheSimple
+from grapheMPM import GrapheSimple, mat2tex
 
 # dico des prédecesseurs
 # dico des prédecesseurs
@@ -157,10 +157,15 @@ G.gv.render("ex-simple")
 G.makeGraphviz(fermeture=True)
 G.gv.render("ex-simple-full")
 
-print(G.mat2tex(G.mat_adj))
+print(mat2tex(G.mat_adj))
+print(G.Matrices_latex[1]) # équivalent, la num 0 est celle de fermeture transitive
+
+print(G.tab_latex_pred)
+print(G.tab_latex_succ)
 ```
 
-```latex
+<table><tbody><tr>
+<td>```latex
 \begin{pmatrix}
   0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
@@ -174,7 +179,48 @@ print(G.mat2tex(G.mat_adj))
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
 \end{pmatrix}
+```</td>
+<td>```latex
+\begin{tabular}{|c|c|}
+\toprule
+Sommet & Prédécesseur(s) \\
+\midrule
+     A &                 \\
+     B &                 \\
+     C &               A \\
+     D &              AB \\
+     E &               B \\
+     F &              DE \\
+     G &               E \\
+     H &              CF \\
+     I &              FG \\
+     J &              HI \\
+     K &               I \\
+\bottomrule
+\end{tabular}
+```</td>
+<td>```latex
+\begin{tabular}{|c|c|}
+\toprule
+Sommet & Successeur(s) \\
+\midrule
+     A &            CD \\
+     B &            DE \\
+     C &             H \\
+     D &             F \\
+     E &            FG \\
+     F &            HI \\
+     G &             I \\
+     H &             J \\
+     I &            JK \\
+     J &               \\
+     K &               \\
+\bottomrule
+\end{tabular}
 ```
+</td>
+</tr></tbody>
+</table>
 
 **Astuce**: quand on oublie le nom des attributs disponibles, on peut lister le
 contenu de l'objet en tapant `dir(G)`.
