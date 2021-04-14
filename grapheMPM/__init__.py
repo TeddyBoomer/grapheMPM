@@ -29,12 +29,10 @@ from pandas import DataFrame
 def tab_latex(t:dict, p:bool)->str:
     """vers la version latex du tableau des prédécesseurs/successeurs.
 
-    il est intéressant de disposer des versions latex des tableaux des
-    successeurs et des prédécesseurs.
     il arrive que les valeurs soient sous forme de liste dans les
     prédécesseurs par exemple:{'1': ['1'], '2': ['1', '2', '3'], '3': ['2',
-    '3'], '4': ['1', '4', '5'], '5': ['4', '5']}. on les remet sous forme
-    de chaine.
+    '3'], '4': ['1', '4', '5'], '5': ['4', '5']}. on les joint en
+    chaine.
 
     :param t: dictionnaire à traiter
     :param p: booléen d'activation si c'est le tableau des prédecesseurs
@@ -43,9 +41,9 @@ def tab_latex(t:dict, p:bool)->str:
     # sinon cela modifie l'original dans l'objet GrapheSimple…
     tmp = t.copy()
     for i in tmp.keys():
-        if isinstance(tmp[i], list):
-            ch = ''.join(tmp[i])
-            tmp.update({i:ch})
+        # on sépare tous les éléments par ,
+        ch = ','.join(tmp[i])
+        tmp.update({i:ch})
     tmp = sorted(tmp.items(), key=lambda x: x[0])
     T = [ list(x) for x in tmp ]
     columns_labels = ["Sommet",
@@ -152,8 +150,12 @@ class GrapheSimple():
     :predecesseurs: dict des prédecesseurs
     :tab_latex_pred: str du tableau latex des prédecesseurs
     :tab_latex_succ: str du tableau latex des successeurs
-    :mat_adj: matrix matrice d'adjacence
-    :mat_ferm_transitive: matrix matrice de fermeture transitive
+    :numpy.matrix mat_adj: matrix matrice d'adjacence
+    :numpy.matrix mat_ferm_transitive: matrix matrice de fermeture transitive
+    :list Matrices: liste des puissances de mat_adj, Matrices[0] contient la
+    matrice de fermeture transitive, puis on trouve ensuite M^1, M^2,…, M^n où
+    n est le nombre de sommets.
+    :list Matrices_latex: liste des mêmes matrices en export latex pmatrix.
 
     Exemple::
 
@@ -161,18 +163,18 @@ class GrapheSimple():
        "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI"}
     >>> GS = GrapheSimple(pred=p)
     >>> print(mat2tex(GS.mat_ferm_transitive))
-    \begin{pmatrix}
-      0 & 0 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 1\\
-      0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1\\
-      0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1\\
-      0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
-      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
-    \end{pmatrix}
+    \\begin{pmatrix}
+      0 & 0 & 1 & 1 & 0 & 1 & 0 & 1 & 1 & 1\\\\
+      0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 1 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\\\
+    \\end{pmatrix}
     >>> GS.Matrices_latex[O] # équivalent à ligne précédente
     >>> GS.Matrices_latex
     >>> print(GS.tab_latex_pred)

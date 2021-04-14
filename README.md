@@ -77,14 +77,14 @@ G.gv.render("ex-ed-nomarge")
 ```
 L'avant dernière ligne permet de changer le format d'image à svg plutôt que png.
 
-<img src="illustrations/ex-ed-nomarge.png" width="500">
+<img src="illustrations/ex-ed-nomarge.png" width="600">
 
 ```python
 G.latestdate()
 G.makeGraphviz()
 G.gv.render("ex-full-nomarge")
 ```
-<img src="illustrations/ex-full-nomarge.png" width="500">
+<img src="illustrations/ex-full-nomarge.png" width="600">
 
 observation du paramètre `presentation` (à 1 par défaut) permet de régler la
 répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe
@@ -92,16 +92,16 @@ complet avec `presentation=1` puis `presentation=2`:
 
 
 ```python
-G = GrapheMPM(pred=p, pond=w, presentation=1)
+G = GrapheMPM(pred=p, pond=w, marges=True, presentation=1)
 # […]
 ```
-<img src="illustrations/ex-full.png" width="500">
+<img src="illustrations/ex-full.png" width="600">
 
 ```python
-G = GrapheMPM(pred=p, pond=w, presentation=2)
+G = GrapheMPM(pred=p, pond=w, marges=True, presentation=2)
 # […]
 ```
-<img src="illustrations/ex-full-2.png" width="500">
+<img src="illustrations/ex-full-2.png" width="600">
 
 
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
@@ -125,6 +125,7 @@ l'attribut `rankdir` pour `.gv` qui vaut `LR` (left-right) par défaut:
 G.gv.attr(rankdir="TB") # top-bottom
 G.gv.attr(rankdir="BT") # bottom-top
 G.gv.attr(rankdir="RL") # right-left
+G.gv.render("image")
 ```
 <table>
  <tbody><tr>
@@ -234,10 +235,10 @@ Sommet & Successeur(s) \\
 contenu de l'objet en tapant `dir(G)`.
 
 
-Vous pourrez observer que graphviz ne met pas forcément les sommets sur le niveau 
-attendu si on ne le force pas (sommet C):
+Vous pourrez observer que graphviz ne met pas forcément les sommets sur le
+niveau attendu si on ne le force pas (sommet C):
 
-<img src="illustrations/ex-simple.png" width="500"> <img src="illustrations/ex-simple-full.png" height="500">
+<img src="illustrations/ex-simple.png" width="300"> <img src="illustrations/ex-simple-full.png" height="500">
 
 Installation ou mise à jour
 ===========================
