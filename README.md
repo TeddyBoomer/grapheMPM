@@ -195,13 +195,13 @@ Sommet & Prédécesseur(s) \\
      A &                 \\
      B &                 \\
      C &               A \\
-     D &              AB \\
+     D &             A,B \\
      E &               B \\
-     F &              DE \\
+     F &             D,E \\
      G &               E \\
-     H &              CF \\
-     I &              FG \\
-     J &              HI \\
+     H &             C,F \\
+     I &             F,G \\
+     J &             H,I \\
      K &               I \\
 \bottomrule
 \end{tabular}
@@ -215,15 +215,15 @@ Sommet & Prédécesseur(s) \\
 \toprule
 Sommet & Successeur(s) \\
 \midrule
-     A &            CD \\
-     B &            DE \\
+     A &           C,D \\
+     B &           D,E \\
      C &             H \\
      D &             F \\
-     E &            FG \\
-     F &            HI \\
+     E &           F,G \\
+     F &           H,I \\
      G &             I \\
      H &             J \\
-     I &            JK \\
+     I &           J,K \\
      J &               \\
      K &               \\
 \bottomrule
