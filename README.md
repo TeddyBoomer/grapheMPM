@@ -72,7 +72,7 @@ G = GrapheMPM(pred=p, pond=w, marges=False) # par défaut marges=False
 G.earliestdate()
 G.makeGraphviz()
 G.gv.render("ex-ed-nomarge")
-G.gv.format("svg")
+G.gv.format = "svg"
 G.gv.render("ex-ed-nomarge")
 ```
 L'avant dernière ligne permet de changer le format d'image à svg plutôt que png.

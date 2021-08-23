@@ -237,7 +237,7 @@ class GrapheSimple():
         Puissances.insert(0, self.mat_ferm_transitive)
         self.Matrices = Puissances
         #Puissances_latex =[ latex(Matrix(M),mat_delim='(') for M in Puissances ]
-        self.Matrices_latex =[ mat2tex(M) for M in Puissances ]
+        self.Matrices_latex = [ mat2tex(M) for M in Puissances ]
         ## tableaux latex pour les prédécesseurs et les successeurs:
         self.tab_latex_pred = tab_latex(self.predecesseurs, True)
         self.tab_latex_succ = tab_latex(self.successeurs, False)
