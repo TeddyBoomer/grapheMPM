@@ -45,7 +45,22 @@ deux fonctions techniques sont présentes dans le module:
 
 * fonction `mat2tex` pour afficher l'export LaTeX d'une matrice (objet pmatrix)
 * fonction `tab_latex` pour convertir les dictionnaires des prédecesseurs et successeurs en latex.
- 
+
+**Astuce**: pour récupérer la durée minimale du projet après tous les calculs:
+
+```
+[…]
+G = GrapheMPM(…)
+[…]
+G.makeGraphviz()
+# le sommet fin contient l'information de durée minimale du projet
+print(G.sommets['fin'].data['ed'])
+```
+
+chaque nœud de tâche contient en effet un dictionnaire `data` avec ses dates
+respectivement au plus tôt `ed` (earliest date), au plus tard `ld` (latest
+date), la marge totale `mt`, la marge libre `ml`.
+
 dépendances:
 ============
 
@@ -253,6 +268,11 @@ Vous pourrez observer que graphviz ne met pas forcément les sommets sur le
 niveau attendu si on ne le force pas (sommet C):
 
 <img src="illustrations/ex-simple.png" width="300"> <img src="illustrations/ex-simple-full.png" height="500">
+
+C'est pourquoi vous pouvez désormais utiliser une class `GrapheSimpleNoCircuit`
+si vous voulez insistez sur l'organisation par niveau.
+
+<img src="illustrations/ex-simple-levels.png" width="300">
 
 Installation ou mise à jour
 ===========================
