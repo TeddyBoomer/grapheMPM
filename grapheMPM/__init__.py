@@ -42,7 +42,7 @@ def tab_latex(t:dict, p:bool)->str:
     tmp = t.copy()
     for i in tmp.keys():
         # on sépare tous les éléments par ,
-        ch = ','.join(tmp[i])
+        ch = ','.join(list(tmp[i]))
         tmp.update({i:ch})
     tmp = sorted(tmp.items(), key=lambda x: x[0])
     T = [ list(x) for x in tmp ]
@@ -241,7 +241,14 @@ class GrapheSimple():
         ## tableaux latex pour les prédécesseurs et les successeurs:
         self.tab_latex_pred = tab_latex(self.predecesseurs, True)
         self.tab_latex_succ = tab_latex(self.successeurs, False)
-    
+
+    def has_no_circuit(self):
+        """tester si le graphe est sans circuit
+
+        :rtype: bool
+        """
+        return self.mat_ferm_transitive.diagonal().sum() == 0
+
     def makeGraphviz(self, fermeture=False):
         """générer l'objet graphviz
 
@@ -269,6 +276,83 @@ class GrapheSimple():
                          self.num_sommets[j+1], color=couleur)
         self.gv = dot
 
+
+class GrapheSimpleNoCircuit(GrapheSimple):
+    """pour un graphe sans circuit, on peut organiser par niveaux
+
+    Il suffit de rajouter des groupements syntaxiques de nœuds sans utiliser
+    les subgraphs (qui font des résultats étranges).
+    """
+    def __init__(self, succ=None, pred=None, make_node=str):
+        GrapheSimple.__init__(self, succ=succ, pred=pred,
+                              make_node=make_node)
+        if self.has_no_circuit():
+            self.setlevel()
+
+    def _col_is_null(self, M, i):
+        """la colonne i de M est-elle nulle?
+        """
+        return sum(M[:, i]) == 0
+    
+    def setlevel(self):
+        """calculer les niveaux des sommets
+
+        créer un attribut self.niveaux de type dict.
+        clé, valeur: nom du sommet, niveau
+        :rtype: None
+        """
+        A = self.mat_adj.copy()
+        L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
+        c = 0 # compteur de niveau
+        D = {} # dico des niveaux
+        for e in L: # mise à jour niveau 0
+            D[e] = c
+        while len(D) < len(A):
+            c += 1
+            A *= self.mat_adj
+            M = L
+            L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
+            # calcul des nv sommets sans pred
+            delta = set(L).difference(set(M))
+            for e in delta: # mise à jour niveau c
+                D[e] = c
+        D1 = [(self.num_sommets[k], v) for k, v in D.items()]
+        self.niveaux = dict(D1)
+
+    def makeGraphviz(self, fermeture=False):
+        """générer l'objet graphviz
+
+        :rtype: None
+        :param fermeture: indique si on relie avec la fermeture
+        transitive
+        :type fermeture: bool
+        """
+        dot = Digraph(comment="graphe orienté simple",
+                      node_attr={"shape":"ellipse"})
+        dot.attr("graph", rankdir="LR")
+        dot.format = "png"
+
+        for k in self.successeurs.keys():
+            dot.node(k)
+
+        choix = {True: self.mat_ferm_transitive, False: self.mat_adj}
+        N = len(self.successeurs) #nb de sommets
+        for i in range(N):
+            for j in range(N):
+                if choix[fermeture][i, j]:
+                    # à méditer: arc noir si on n'est pas dans la fermeture tr.
+                    couleur = ('black' if choix[not fermeture][i,j] else 'red')
+                    dot.edge(self.num_sommets[i+1],
+                         self.num_sommets[j+1], color=couleur)
+        # ajout des groupes par niveaux
+        # au plus N niveaux où N est le nb de sommets
+        if self.has_no_circuit():
+            NIV = [[e for e in self.niveaux if self.niveaux[e] == n] for n in range(N)]
+            for e in NIV:
+                if len(e) > 0:
+                    dot.body.append(f"{{rank=same; {' '.join(e)}}}")
+        self.gv = dot
+        
 
 class GrapheMPM(GrapheSimple):
     """Classe de génération d'un graphe d'ordonnancement par les
@@ -341,9 +425,11 @@ class GrapheMPM(GrapheSimple):
                               make_node=make_node)
         self.setlevel()
 
-    def makeGraphviz(self):
+    def makeGraphviz(self, pretty=True):
         """générer l'objet graphviz
+
         :rtype: None
+        :param pretty: éviter les clusters (étranges) (default True)
         """
         dot = Digraph(comment="graphe MPM",
                       node_attr={"shape":"plaintext"})
@@ -352,17 +438,24 @@ class GrapheMPM(GrapheSimple):
         # création des sous-graphes par niveau
         NIVtmp = list(set(self.niveaux.values()))
         NIV = sorted(NIVtmp)
-
-        for N in NIV:
-            with dot.subgraph(name=f"cluster_{N}",
-                              node_attr={'rank': 'same'}) as c:
-                c.attr(style="invis") # désactivation du cadre de cluster
-                if self.show_level:
-                    c.node(f"niv{N}")
-                for k, n in self.sommets.items(): # key, noeud
-                    if self.niveaux[k] == N:
-                        c.node(str(k), f"<{n.noeud}>")
-                        # la str html doit être encadrée de <>
+        if not(pretty): # méthode ancienne - clusters
+            for N in NIV:
+                with dot.subgraph(name=f"cluster_{N}", # aspect cluster
+                                  node_attr={'rank': 'same'}) as c:
+                    c.attr(style="invis") # désactivation du cadre de cluster
+                    if self.show_level:
+                        c.node(f"niv{N}")
+                        for k, n in self.sommets.items(): # key, noeud
+                            if self.niveaux[k] == N:
+                                c.node(str(k), f"<{n.noeud}>")
+                                # la str html doit être encadrée de <>
+        else:
+            gpby = [[e for e in self.niveaux if self.niveaux[e] == n] for n in NIV]
+            for i,e in enumerate(gpby):
+                if len(e) > 0:
+                    for k in e:
+                        dot.node(str(k), f"<{self.sommets[k].noeud}>")
+                    dot.body.append(f"{{rank=same; {' '.join(e)}}}")
 
         # branchement du nœud de départ:
         dot.node("debut", self.titre_debut, shape='ellipse')

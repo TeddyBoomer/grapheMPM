@@ -21,9 +21,19 @@ d'ordonnancement.
   - la liste de leur export latex `GrapheSimple.Matrices_latex`
 * export latex du tableau des prédecesseurs `GrapheSimple.tab_latex_pred`
 * export latex du tableau des successeurs `GrapheSimple.tab_latex_succ`
+* une fonction de test booléen `has_no_circuit` (simple commodité: on regarde si il y a des 0 sur la diagonale de la matrice de fermeture transitive),
 * le dictionnaire `num_sommets` pour lier leur nom à leur emplacement dans la matrice d'adjacence,
 * l'objet `gv` qui est sa traduction Graphviz (à créer et recharger par la méthode `makeGraphviz`)
 (on peut générer le graphe normal ou complété avec la fermeture transitive)
+
+## La classe `GrapheSimpleNoCircuit`: 
+
+Dans celle-ci, vous subodorez qu'il n'y a pas de circuit (c'est testé à
+l'initialisation) et dans ce cas, les sommets sont organisés par niveaux comme
+on l'attendrait. Si par malheur il y a un circuit, le tracé est alors celui
+d'un `GrapheSimple`.
+
+Elle comporte donc la méthode `setlevel` de calcul des niveaux.
 
 ## La classe `GrapheMPM` hérite des attributs et méthodes de `GrapheSimple` avec en plus:
 
@@ -45,8 +55,9 @@ dépendances:
 Illustration de principe:
 =========================
 
-objet GrapheMPM
-----------------
+**Nouveau (v>=0.7)**: méthode de commodité `GrapheSimple.has_no_circuit()`. De
+  plus l'organisation par niveaux est améliorée (éviter d'utiliser les subgraphs)
+
 **Nouveau (v>=0.6)**: puissances de la matrice d'adjacence (en numpy et en latex) disponibles
   par défaut, les marges ne sont plus affichées.
 
@@ -55,6 +66,9 @@ objet GrapheMPM
 **Nouveau (v>=0.5)**: plus besoin de renseigner des sommets 'début' et 'fin'
 
 **Nouveau (v>=0.4)**: Les poids peuvent être des décimaux.
+
+objet GrapheMPM
+----------------
 
 On créée un objet `GrapheMPM` à l'aide d'un dictionnaire des successeurs ou des prédecesseurs et un dictionnaire des pondérations.
 
@@ -147,7 +161,7 @@ On peut générer le graphe simple, ou sa version complète avec fermeture trans
 from grapheMPM import GrapheSimple, mat2tex
 
 # dico des prédecesseurs
-# dico des prédecesseurs
+
 p = {"A": "", "B": "", "C": "A", "D": "AB", "E":"B",
      "F":"DE", "G": "E", "H":"CF", "I":"FG", "J": "HI", "K": "I"}
 
