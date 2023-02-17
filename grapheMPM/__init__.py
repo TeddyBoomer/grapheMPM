@@ -1,4 +1,4 @@
-from numpy import matrix, prod, float_, round, floor, uint8
+from numpy import asarray, prod, float_, round, floor, uint8
 from graphviz import Digraph
 from lxml import etree
 from pandas import DataFrame
@@ -49,7 +49,7 @@ def tab_latex(t:dict, p:bool)->str:
     columns_labels = ["Sommet",
                       ("Prédécesseur(s)" if p else "Successeur(s)")]
     df = DataFrame(T, columns=columns_labels)
-    return df.to_latex(index=False, column_format='|'+2*'c|')
+    return df.style.to_latex(column_format='|'+2*'c|')
 
 
 def mat2tex(M):
@@ -59,7 +59,7 @@ def mat2tex(M):
     src: stackoverflow.com - numpy-2d-and-1d-array-to-latex-bmatrix
     :returns: LaTeX pmatrix as a string
     :param M: matrice
-    :type M: numpy matrix
+    :type M: numpy array
 
     Exemple::
 
@@ -150,8 +150,8 @@ class GrapheSimple():
     :predecesseurs: dict des prédecesseurs
     :tab_latex_pred: str du tableau latex des prédecesseurs
     :tab_latex_succ: str du tableau latex des successeurs
-    :numpy.matrix mat_adj: matrix matrice d'adjacence
-    :numpy.matrix mat_ferm_transitive: matrix matrice de fermeture transitive
+    :numpy.array mat_adj: array matrice d'adjacence
+    :numpy.array mat_ferm_transitive: array matrice de fermeture transitive
     :list Matrices: liste des puissances de mat_adj, Matrices[0] contient la
     matrice de fermeture transitive, puis on trouve ensuite M^1, M^2,…, M^n où
     n est le nombre de sommets.
@@ -193,9 +193,9 @@ class GrapheSimple():
             N = len(ssort)
             d = dict(zip(range(1, N+1), ssort))
             self.num_sommets = d
-            self.mat_adj = matrix([[(1 if (d[j] in succ[d[i]]) else 0)
-                                    for j in range(1, N+1)]
-                                   for i in range(1, N+1)])
+            self.mat_adj = asarray([[(1 if (d[j] in succ[d[i]]) else 0)
+                                     for j in range(1, N+1)]
+                                    for i in range(1, N+1)])
             # dico des prédecesseurs
             P = {}
             for i in range(1, N+1):
@@ -214,9 +214,9 @@ class GrapheSimple():
             N = len(ssort)
             d = dict(zip(range(1, N+1), ssort))
             self.num_sommets = d
-            self.mat_adj = matrix([[(1 if (d[i] in pred[d[j]]) else 0)
-                                    for j in range(1, N+1)]
-                                   for i in range(1, N+1)])
+            self.mat_adj = asarray([[(1 if (d[i] in pred[d[j]]) else 0)
+                                     for j in range(1, N+1)]
+                                    for i in range(1, N+1)])
             # dico des successeurs
             S = {}
             for i in range(1, N+1):
@@ -229,7 +229,7 @@ class GrapheSimple():
         Mtmp = self.mat_adj.copy()
         Puissances = [Mtmp]
         for i in range(len(self.sommets)-1): # on a déjà la puissance 1
-            Mtmp = Mtmp*self.mat_adj # mutip normale dans numpy
+            Mtmp = Mtmp @ self.mat_adj # numpy.matmul.html#numpy.matmul
             Puissances.append(Mtmp)
         # somme puissances, comp bool, conversion en int la plus simple
         self.mat_ferm_transitive = (sum(Puissances) > 0).view(dtype=uint8)
@@ -247,7 +247,7 @@ class GrapheSimple():
 
         :rtype: bool
         """
-        return self.mat_ferm_transitive.diagonal().sum() == 0
+        return self.mat_ferm_transitive.trace() == 0 #diagonal().sum()
 
     def makeGraphviz(self, fermeture=False):
         """générer l'objet graphviz
@@ -309,7 +309,7 @@ class GrapheSimpleNoCircuit(GrapheSimple):
             D[e] = c
         while len(D) < len(A):
             c += 1
-            A *= self.mat_adj
+            A = A @ self.mat_adj
             M = L
             L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
             # calcul des nv sommets sans pred
@@ -425,11 +425,10 @@ class GrapheMPM(GrapheSimple):
                               make_node=make_node)
         self.setlevel()
 
-    def makeGraphviz(self, pretty=True):
+    def makeGraphviz(self):
         """générer l'objet graphviz
 
         :rtype: None
-        :param pretty: éviter les clusters (étranges) (default True)
         """
         dot = Digraph(comment="graphe MPM",
                       node_attr={"shape":"plaintext"})
@@ -438,24 +437,16 @@ class GrapheMPM(GrapheSimple):
         # création des sous-graphes par niveau
         NIVtmp = list(set(self.niveaux.values()))
         NIV = sorted(NIVtmp)
-        if not(pretty): # méthode ancienne - clusters
-            for N in NIV:
-                with dot.subgraph(name=f"cluster_{N}", # aspect cluster
-                                  node_attr={'rank': 'same'}) as c:
-                    c.attr(style="invis") # désactivation du cadre de cluster
-                    if self.show_level:
-                        c.node(f"niv{N}")
-                        for k, n in self.sommets.items(): # key, noeud
-                            if self.niveaux[k] == N:
-                                c.node(str(k), f"<{n.noeud}>")
-                                # la str html doit être encadrée de <>
-        else:
-            gpby = [[e for e in self.niveaux if self.niveaux[e] == n] for n in NIV]
-            for i,e in enumerate(gpby):
-                if len(e) > 0:
-                    for k in e:
-                        dot.node(str(k), f"<{self.sommets[k].noeud}>")
-                    dot.body.append(f"{{rank=same; {' '.join(e)}}}")
+        for N in NIV:
+            with dot.subgraph(name=f"cluster_{N}") as c: # style="invis",
+                titre = ((f"niv{N}" if N<NIV[-1] else "") if self.show_level
+                         else "")
+                c.attr(rank="same", label=titre,
+                       labelloc="u", penwidth="0")
+                for k, n in self.sommets.items(): # key, noeud
+                    if self.niveaux[k] == N:
+                        c.node(str(k), f"<{n.noeud}>")
+                        # la str html doit être encadrée de <>
 
         # branchement du nœud de départ:
         dot.node("debut", self.titre_debut, shape='ellipse')
@@ -468,11 +459,6 @@ class GrapheMPM(GrapheSimple):
             for i in list(L):
                 dot.edge(k, i, label=str(self.ponderation[k]),
                          tailport="here", headport="here") # from to
-        # création des liaisons de titres de niveaux
-        if self.show_level:
-            for N in NIV[:-1]:
-                dot.edge(f"niv{N}", f"niv{N+1}", style='invis')
-
         self.gv = dot
 
     def setlevel(self):
@@ -490,7 +476,7 @@ class GrapheMPM(GrapheSimple):
             D[e] = c
         while len(D) < len(A):
             c += 1
-            A *= self.mat_adj
+            A = A @ self.mat_adj
             M = L
             L = [(i+1) for i in range(len(A)) if self._col_is_null(A, i)]
             # calcul des nv sommets sans pred

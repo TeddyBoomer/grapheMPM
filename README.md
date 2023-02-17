@@ -14,7 +14,7 @@ d'ordonnancement.
 
 * le dictionnaire `GrapheSimple.successeurs`
 * le dictionnaire `GrapheSimple.predecesseurs`,
-* matrices liées au graphe de type `numpy.matrix`:
+* matrices liées au graphe de type `numpy.ndarray`:
   - la matrice d'adjacence `GrapheSimple.mat_adj`,
   - la matrice de fermeture transitive `GrapheSimple.mat_ferm_transitive`,
   - la liste des puissances de la matrice d'adjacence `GrapheSimple.Matrices`. La 1ere est celle de la matrice de fermeture transitive.
@@ -71,7 +71,7 @@ Illustration de principe:
 =========================
 
 **Nouveau (v>=0.7)**: méthode de commodité `GrapheSimple.has_no_circuit()`. De
-  plus l'organisation par niveaux est améliorée (éviter d'utiliser les subgraphs)
+  plus l'organisation par niveaux est améliorée
 
 **Nouveau (v>=0.6)**: puissances de la matrice d'adjacence (en numpy et en latex) disponibles
   par défaut, les marges ne sont plus affichées.
@@ -117,20 +117,17 @@ G.gv.render("ex-full-nomarge")
 
 observation du paramètre `presentation` (à 1 par défaut) permet de régler la
 répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe
-complet avec `presentation=1` puis `presentation=2`:
-
-
-```python
-G = GrapheMPM(pred=p, pond=w, marges=True, presentation=1)
-# […]
-```
-<img src="illustrations/ex-full.png" width="600">
+complet avec les deux variantes de présentation:
 
 ```python
-G = GrapheMPM(pred=p, pond=w, marges=True, presentation=2)
+G1 = GrapheMPM(pred=p, pond=w, marges=True, presentation=1)
+G2 = GrapheMPM(pred=p, pond=w, marges=True, presentation=2)
 # […]
 ```
-<img src="illustrations/ex-full-2.png" width="600">
+
+| `presentation=1` | `presentation=2` |
+|------------------|------------------|
+| <img src="illustrations/ex-full.png" width="400"> | <img src="illustrations/ex-full-2.png" width="400"> |
 
 
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
@@ -142,9 +139,19 @@ nommés:
 Les méthodes `earliestdate, latestdate` mettent à jour les dates des nœuds et
 doivent être appliquées dans le bon ordre.
 
-**expérimental**: le paramètre `show_level` (`True/False`) est disponible pour
-l'initialisation, mais ça ne fait pas forcément un bon rendu, les sommets étant
-mélangés dans les niveaux; c'est graphviz qui les organise.
+
+**show_level** (opérationnel): ce paramètre `show_level` (`True/False`) est disponible pour
+l'initialisation:
+
+```python
+G1 = GrapheMPM(pred=p, pond=w, marges=False, presentation=1, show_level=False)
+G2 = GrapheMPM(pred=p, pond=w, marges=False, presentation=1, show_level=True)
+# […]
+```
+| `show_level=False` (par défaut) | `show_level=True` |
+|------------------|------------------|
+| <img src="illustrations/test_sl_off.png" width="400"> | <img src="illustrations/test_sl_one.png" width="400"> |
+
 
 **Astuce d'orientation**: pour les plus téméraires, vous pouvez choisir
 l'orientation du graphe au moment du rendu. Il suffit de préciser la valeur de

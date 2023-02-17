@@ -14,7 +14,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version="0.7",
+    version="0.7.1",
     description="a bunch of classes to generate MPM graphs",
     long_description=long_description,
 
@@ -37,8 +37,8 @@ setup(
         'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
-        'Intended Audience :: Teachers',
-        'Topic :: graphs scheduling',
+        'Intended Audience :: Education',
+        "Topic :: Education :: Computer Aided Instruction (CAI)"
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
