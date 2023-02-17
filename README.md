@@ -150,7 +150,7 @@ G2 = GrapheMPM(pred=p, pond=w, marges=False, presentation=1, show_level=True)
 ```
 | `show_level=False` (par défaut) | `show_level=True` |
 |------------------|------------------|
-| <img src="illustrations/test_sl_off.png" width="400"> | <img src="illustrations/test_sl_one.png" width="400"> |
+| <img src="illustrations/test_sl_off.png" width="400"> | <img src="illustrations/test_sl_on.png" width="400"> |
 
 
 **Astuce d'orientation**: pour les plus téméraires, vous pouvez choisir
