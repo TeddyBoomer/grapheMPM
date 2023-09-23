@@ -115,19 +115,22 @@ G.gv.render("ex-full-nomarge")
 ```
 <img src="illustrations/ex-full-nomarge.png" width="600">
 
-observation du paramètre `presentation` (à 1 par défaut) permet de régler la
-répartition des marges (l'une sur l'autre ou côte à côte). Voici le graphe
-complet avec les deux variantes de présentation:
+observation du paramètre `presentation` 
+
+* 1: (par défaut) présenter les marges l'une sur l'autre 
+* 2: marges côte à côte
+* 3: dates et marges au-dessus du nom du nœud et côte à côte
 
 ```python
 G1 = GrapheMPM(pred=p, pond=w, marges=True, presentation=1)
 G2 = GrapheMPM(pred=p, pond=w, marges=True, presentation=2)
+G3 = GrapheMPM(pred=p, pond=w, marges=True, presentation=3)
 # […]
 ```
 
-| `presentation=1` | `presentation=2` |
-|------------------|------------------|
-| <img src="illustrations/ex-full.png" width="400"> | <img src="illustrations/ex-full-2.png" width="400"> |
+| `presentation=1` | `presentation=2` | `presentation=3` |
+|------------------|------------------|------------------|
+| <img src="illustrations/ex-full.png" width="250"> | <img src="illustrations/ex-full-2.png" width="250"> | <img src="illustrations/ex-full-3.png" width="250"> |
 
 
 **Attention**: depuis la version v0.3, on initialise l'objet avec des éléments
@@ -150,7 +153,7 @@ G2 = GrapheMPM(pred=p, pond=w, marges=False, presentation=1, show_level=True)
 ```
 | `show_level=False` (par défaut) | `show_level=True` |
 |------------------|------------------|
-| <img src="illustrations/test_sl_off.png" width="400"> | <img src="illustrations/test_sl_on.png" width="400"> |
+| <img src="illustrations/test_sl_off.png" width="350"> | <img src="illustrations/test_sl_on.png" width="350"> |
 
 
 **Astuce d'orientation**: pour les plus téméraires, vous pouvez choisir

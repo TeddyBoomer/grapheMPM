@@ -110,19 +110,38 @@ class noeud():
         D = {"BORDER":"0", "CELLBORDER":"1",
              "CELLSPACING":"0", "CELLPADDING":"4"}
         E.attrib.update(D)
+        if self.presentation<=2:
+            T1 = etree.SubElement(E, "TR")
+            ti = etree.SubElement(T1, "TD")
+            ti.text = self.titre
+            ti.attrib["COLSPAN"] = str(2)
+            ti.attrib["PORT"] = "here"
 
-        T1 = etree.SubElement(E, "TR")
-        ti = etree.SubElement(T1, "TD")
-        ti.text = self.titre
-        ti.attrib["COLSPAN"] = str(2)
-        ti.attrib["PORT"] = "here"
+            T2 = etree.SubElement(E, "TR")
+            t21 = etree.SubElement(T2, "TD")
+            t21.text = self.data["ed"]
+            #t21.attrib["PORT"]="to"
+            t22 = etree.SubElement(T2, "TD")
+            t22.text = self.data["ld"]
+        elif self.presentation == 3:
+            T2 = etree.SubElement(E, "TR")
+            t21 = etree.SubElement(T2, "TD")
+            t21.text = self.data["ed"]
+            #t21.attrib["PORT"]="to"
+            t22 = etree.SubElement(T2, "TD")
+            t22.text = self.data["ld"]
+            if self.marges:
+                T3 = etree.SubElement(E, "TR")
+                t31 = etree.SubElement(T3, "TD")
+                t31.text = self.data["ml"]
+                t32 = etree.SubElement(T3, "TD")
+                t32.text = self.data["mt"]
+            T1 = etree.SubElement(E, "TR")
+            ti = etree.SubElement(T1, "TD")
+            ti.text = self.titre
+            ti.attrib["COLSPAN"] = str(2)
+            ti.attrib["PORT"] = "here"
 
-        T2 = etree.SubElement(E, "TR")
-        t21 = etree.SubElement(T2, "TD")
-        t21.text = self.data["ed"]
-        #t21.attrib["PORT"]="to"
-        t22 = etree.SubElement(T2, "TD")
-        t22.text = self.data["ld"]
         #t22.attrib["PORT"]="from"
         if (self.presentation == 1) and self.marges:
             T3 = etree.SubElement(E, "TR")
