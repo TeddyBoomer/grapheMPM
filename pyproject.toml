@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grapheMPM"
-version = "0.7.2"
+version = "0.7.3"
 description = "a bunch of classes to generate MPM graphs"
 readme = "README.md"
 authors = [{name = "B.M.", email = "teddy_boomer@yahoo.fr"}]
@@ -16,14 +16,17 @@ dependencies = [
     "numpy",
     "pandas"
 ]
-urls = {Homepage = "https://github.com/TeddyBoomer/grapheMPM"}
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Education",
     "Topic :: Education :: Computer Aided Instruction (CAI)",
     "Programming Language :: Python :: 3"
 ]
+
+[project.urls]
+Homepage = "https://github.com/TeddyBoomer/grapheMPM"
+Source = "https://forge.apps.education.fr/mauricetteboris/grapheMPM"
+
 
 [tool.setuptools.packages.find]
 where = ["."]
