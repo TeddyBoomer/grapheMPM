@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grapheMPM"
+version = "0.7.2"
+description = "a bunch of classes to generate MPM graphs"
+readme = "README.md"
+authors = [{name = "B.M.", email = "teddy_boomer@yahoo.fr"}]
+license = "GPL-3.0-or-later"
+keywords = ["python", "graphviz", "scheduling", "graph"]
+dependencies = [
+    "graphviz",
+    "lxml",
+    "numpy",
+    "pandas"
+]
+urls = {Homepage = "https://github.com/TeddyBoomer/grapheMPM"}
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Education",
+    "Topic :: Education :: Computer Aided Instruction (CAI)",
+    "Programming Language :: Python :: 3"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["grapheMPM"]
