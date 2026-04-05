@@ -294,22 +294,22 @@ d'archive **wheel**)
 
 L'installateur pip veillera à installer les dépendances.
 
-Pour windows:
+Pour Windows:
 
-```
-py -3 -m pip install \chemin\vers\grapheMPM-xxx-py3-none-any.whl
+```bat
+python.exe -m pip install \chemin\vers\grapheMPM-xxx-py3-none-any.whl
 ```
 
-Pour linux:
+Pour GNU/Linux:
 
-```
-pip3 install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
+```bash
+pip install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
 
 Pour mettre à jour quand on a déjà le module, on peut ajouter un paramètre `-U`
-ou `--upgrade` pour accepter la version la plus récente. exemple linux:
+ou `--upgrade` pour accepter la version la plus récente. exemple GNU/Linux:
 
-```
-pip3 install -U  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
+```bash
+pip install -U  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
 
