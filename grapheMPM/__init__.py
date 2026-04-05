@@ -394,7 +394,7 @@ class GrapheMPM(GrapheSimple):
     >>> G.latestdate()
     >>> G.makeGraphviz()
     >>> G.gv.render("ex-full")
-    >>> G.gv.format("svg")
+    >>> G.gv.format = "svg"
     >>> G.gv.render("ex-full")
     """
 
