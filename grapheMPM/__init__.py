@@ -1,4 +1,4 @@
-from numpy import asarray, prod, float_, round, floor, uint8
+from numpy import asarray, prod, float16, round, floor, uint8
 from graphviz import Digraph
 from lxml import etree
 from pandas import DataFrame
@@ -514,7 +514,7 @@ class GrapheMPM(GrapheSimple):
         """convertir la chaîne de caractère s en nombre int ou float
         si s contient un . on renvoie un numpy.float_ sinon un int
         """
-        return float_(s) if "." in s else int(s)
+        return float16(s) if "." in s else int(s)
 
     def _pretty(self, n):
         """convertir un nombre n en string selon qu'il soit int ou float_ en 

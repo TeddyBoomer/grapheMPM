@@ -1,0 +1,6 @@
+grapheMPM.egg-info/
+__pycache__/
+venv/
+dist/
+*.pyc
+*.pyo
