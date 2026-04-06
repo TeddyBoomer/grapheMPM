@@ -306,6 +306,9 @@ Pour GNU/Linux:
 pip install  /chemin/vers/grapheMPM-xxx-py3-none-any.whl
 ```
 
+⚠ Note : pour les systèmes GNU/Linux et macOS récents (python >=3.12) il faut
+ajouter l'option `--break-system-packages`.
+
 Pour mettre à jour quand on a déjà le module, on peut ajouter un paramètre `-U`
 ou `--upgrade` pour accepter la version la plus récente. exemple GNU/Linux:
 
